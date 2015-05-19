@@ -24,9 +24,9 @@ static void power_supply_update_bat_leds(struct power_supply *psy)
 {
 	union power_supply_propval status, bat_percent;
 
-	if (psy->get_property(psy, POWER_SUPPLY_PROP_STATUS, &status))
+	if (power_supply_get_property(psy, POWER_SUPPLY_PROP_STATUS, &status))
 		return;
-	if (psy->get_property(psy, POWER_SUPPLY_PROP_CAPACITY, &bat_percent))
+	if (power_supply_get_property(psy, POWER_SUPPLY_PROP_CAPACITY, &bat_percent))
 		return;
 
 	switch (status.intval) {
@@ -109,7 +109,7 @@ static void power_supply_update_gen_leds(struct power_supply *psy)
 {
 	union power_supply_propval online;
 
-	if (psy->get_property(psy, POWER_SUPPLY_PROP_ONLINE, &online))
+	if (power_supply_get_property(psy, POWER_SUPPLY_PROP_ONLINE, &online))
 		return;
 
 	dev_dbg(psy->dev, "%s %d\n", __func__, online.intval);
