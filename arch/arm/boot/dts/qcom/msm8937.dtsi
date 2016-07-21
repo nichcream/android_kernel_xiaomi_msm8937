@@ -99,6 +99,13 @@
 			reg = <0x0 0x8dd00000 0x0 0x1400000>;
 		};
 
+		ramoops_mem: ramoops_region@8d000000 {
+			linux,reserve-contiguous-region;
+			linux,reserve-region;
+			linux,remove-completely;
+			reg = <0x0 0x8d000000 0x0 0x40000>;
+			label = "ramoops_mem";
+		};
 	};
 
 	aliases {
@@ -218,6 +225,8 @@
 			reg = <0xb128000 0x1000>;
 			status = "disabled";
 		};
+
+
 	};
 
 	qcom,rmtfs_sharedmem@00000000 {
@@ -1937,6 +1946,19 @@
 
 	qcom,msm-ssc-sensors {
 		compatible = "qcom,msm-ssc-sensors";
+	};
+
+	ramoops {
+		compatible = "ramoops";
+		status = "okay";
+
+		android,ramoops-buffer-start = <0x8d000000>;
+		android,ramoops-buffer-size =  <0x40000>;
+		android,ramoops-console-size = <0x10000>;
+		android,ramoops-record-size = <0x10000>;
+		android,ramoops-pmsg-size = <0x20000>;
+		android,ramoops-dump-oops = <0x1>;
+		android,ramoops-ecc-info = <0 16 0 0>; /* < block_size, ecc_size, sym_size, poly >, only ecc_size will suffice to enable ecc */
 	};
 
 };
