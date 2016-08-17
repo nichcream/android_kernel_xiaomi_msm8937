@@ -115,4 +115,21 @@ static inline enum bug_trap_type report_bug(unsigned long bug_addr,
 #else
 #define PANIC_CORRUPTION 0
 #endif  /* CONFIG_PANIC_ON_DATA_CORRUPTION */
+
+/*
+ * Since detected data corruption should stop operation on the affected
+ * structures, this returns false if the corruption condition is found.
+ */
+#define CHECK_DATA_CORRUPTION(condition, fmt, ...)			 \
+	do {								 \
+		if (unlikely(condition)) {				 \
+			if (IS_ENABLED(CONFIG_BUG_ON_DATA_CORRUPTION)) { \
+				pr_err(fmt, ##__VA_ARGS__);		 \
+				BUG();					 \
+			} else						 \
+				WARN(1, fmt, ##__VA_ARGS__);		 \
+			return false;					 \
+		}							 \
+	} while (0)
+
 #endif	/* _LINUX_BUG_H */
