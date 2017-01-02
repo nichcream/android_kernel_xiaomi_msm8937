@@ -94,6 +94,8 @@ static const char * const restart_levels[] = {
 	[RESET_SUBSYS_COUPLED] = "RELATED",
 };
 
+#define WT_SUBSYSTEM_REASTART_LEVEL "RELATED"
+
 /**
  * struct subsys_tracking - track state of a subsystem or restart order
  * @p_state: private state of subsystem/order
