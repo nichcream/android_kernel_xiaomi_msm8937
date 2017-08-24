@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2016 The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2015 The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -56,12 +56,12 @@ static void vpe_mem_dump(const char * const name, const void * const addr,
 	int i;
 	u32 *p = (u32 *) addr;
 	u32 data;
-	VPE_DBG("%s: (%s) %pK %d\n", __func__, name, addr, size);
+	VPE_DBG("%s: (%s) %p %d\n", __func__, name, addr, size);
 	line_str[0] = '\0';
 	p_str = line_str;
 	for (i = 0; i < size/4; i++) {
 		if (i % 4 == 0) {
-			snprintf(p_str, 12, "%pK: ", p);
+			snprintf(p_str, 12, "%p: ", p);
 			p_str += 10;
 		}
 		data = *p++;
@@ -614,7 +614,7 @@ static int vpe_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 		goto err_mutex_unlock;
 	}
 
-	VPE_DBG("open %d %pK\n", i, &fh->vfh);
+	VPE_DBG("open %d %p\n", i, &fh->vfh);
 	vpe_dev->vpe_open_cnt++;
 	if (vpe_dev->vpe_open_cnt == 1) {
 		rc = vpe_init_hardware(vpe_dev);
@@ -669,7 +669,7 @@ static int vpe_close_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 		return -ENODEV;
 	}
 
-	VPE_DBG("close %d %pK\n", i, &fh->vfh);
+	VPE_DBG("close %d %p\n", i, &fh->vfh);
 	vpe_dev->vpe_open_cnt--;
 	if (vpe_dev->vpe_open_cnt == 0) {
 		vpe_deinit_mem(vpe_dev);
@@ -1054,16 +1054,10 @@ static int vpe_reset(struct vpe_device *vpe_dev)
 	return rc;
 }
 
-static int vpe_update_scale_coef(struct vpe_device *vpe_dev, uint32_t *p)
+static void vpe_update_scale_coef(struct vpe_device *vpe_dev, uint32_t *p)
 {
 	uint32_t i, offset;
 	offset = *p;
-
-	if (offset > VPE_SCALE_COEFF_MAX_N-VPE_SCALE_COEFF_NUM) {
-		pr_err("%s: invalid offset %d passed in", __func__, offset);
-		return -EINVAL;
-	}
-
 	for (i = offset; i < (VPE_SCALE_COEFF_NUM + offset); i++) {
 		VPE_DBG("Setting scale table %d\n", i);
 		msm_camera_io_w(*(++p),
@@ -1071,8 +1065,6 @@ static int vpe_update_scale_coef(struct vpe_device *vpe_dev, uint32_t *p)
 		msm_camera_io_w(*(++p),
 			vpe_dev->base + VPE_SCALE_COEFF_MSBn(i));
 	}
-
-	return 0;
 }
 
 static void vpe_input_plane_config(struct vpe_device *vpe_dev, uint32_t *p)
@@ -1110,16 +1102,13 @@ static void vpe_operation_config(struct vpe_device *vpe_dev, uint32_t *p)
  */
 static void msm_vpe_transaction_setup(struct vpe_device *vpe_dev, void *data)
 {
-	int i, rc = 0;
+	int i;
 	void *iter = data;
 
 	vpe_mem_dump("vpe_transaction", data, VPE_TRANSACTION_SETUP_CONFIG_LEN);
 
 	for (i = 0; i < VPE_NUM_SCALER_TABLES; ++i) {
-		rc = vpe_update_scale_coef(vpe_dev, (uint32_t *)iter);
-		if (rc != 0)
-			return;
-
+		vpe_update_scale_coef(vpe_dev, (uint32_t *)iter);
 		iter += VPE_SCALER_CONFIG_LEN;
 	}
 	vpe_input_plane_config(vpe_dev, (uint32_t *)iter);
