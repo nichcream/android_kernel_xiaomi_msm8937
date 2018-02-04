@@ -627,6 +627,7 @@
 					<0x3 0xc0 0x1>;
 			interrupt-names = "sc-irq", "play-irq";
 			qcom,play-mode = "direct";
+			qcom,pmic-revid = <&pmi8950_revid>;
 			qcom,wave-play-rate-us = <5263>;
 			qcom,actuator-type = "erm";
 			qcom,wave-shape = "square";
