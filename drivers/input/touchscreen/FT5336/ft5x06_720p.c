@@ -4,6 +4,7 @@
  *
  * Copyright (c) 2010  Focal tech Ltd.
  * Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -67,71 +68,72 @@ static u8 TP_Maker, LCD_Maker;
 #define AUTO_CLB_NEED   1
 #define AUTO_CLB_NONEED     0
 static struct Upgrade_Info fts_updateinfo[] = {
-	{0x55, "FT5x06", TPD_MAX_POINTS_5, AUTO_CLB_NEED, 50, 30, 0x79, 0x03, 1,
-	 2000},
-	{0x08, "FT5606", TPD_MAX_POINTS_5, AUTO_CLB_NEED, 50, 30, 0x79, 0x06,
-	 100, 2000},
-	{0x0a, "FT5x16", TPD_MAX_POINTS_5, AUTO_CLB_NEED, 50, 30, 0x79, 0x07, 1,
-	 1500},
-	{0x05, "FT6208", TPD_MAX_POINTS_2, AUTO_CLB_NONEED, 60, 30, 0x79, 0x05,
-	 10, 2000},
-	{0x06, "FT6x06", TPD_MAX_POINTS_2, AUTO_CLB_NONEED, 100, 30, 0x79, 0x08,
-	 10, 2000},
+	{0x55, "FT5x06", TPD_MAX_POINTS_5, AUTO_CLB_NEED, 50, 30, 0x79, 0x03, 1, 2000},
+	{0x08, "FT5606", TPD_MAX_POINTS_5, AUTO_CLB_NEED, 50, 30, 0x79, 0x06, 100, 2000},
+	{0x0a, "FT5x16", TPD_MAX_POINTS_5, AUTO_CLB_NEED, 50, 30, 0x79, 0x07, 1, 1500},
+	{0x05, "FT6208", TPD_MAX_POINTS_2, AUTO_CLB_NONEED, 60, 30, 0x79, 0x05, 10, 2000},
+	{0x06, "FT6x06", TPD_MAX_POINTS_2, AUTO_CLB_NONEED, 100, 30, 0x79, 0x08, 10, 2000},
 	{0x36, "FT6x36", TPD_MAX_POINTS_2, AUTO_CLB_NONEED, 100, 30, 0x79, 0x18, 10, 2000},
-	{0x55, "FT5x06i", TPD_MAX_POINTS_5, AUTO_CLB_NEED, 50, 30, 0x79, 0x03,
-	 1, 2000},
-	{0x14, "FT5336", TPD_MAX_POINTS_10, AUTO_CLB_NONEED, 30, 30, 0x79, 0x11,
-	 10, 2000},
-	{0x13, "FT3316", TPD_MAX_POINTS_5, AUTO_CLB_NONEED, 30, 30, 0x79, 0x11,
-	 10, 2000},
-	{0x12, "FT5436i", TPD_MAX_POINTS_5, AUTO_CLB_NONEED, 30, 30, 0x79, 0x11,
-	 10, 2000},
-	{0x11, "FT5336i", TPD_MAX_POINTS_5, AUTO_CLB_NONEED, 30, 30, 0x79, 0x11,
-	 10, 2000},
+	{0x55, "FT5x06i", TPD_MAX_POINTS_5, AUTO_CLB_NEED, 50, 30, 0x79, 0x03, 1, 2000},
+	{0x14, "FT5336", TPD_MAX_POINTS_10, AUTO_CLB_NONEED, 30, 30, 0x79, 0x11, 10, 2000},
+	{0x13, "FT3316", TPD_MAX_POINTS_5, AUTO_CLB_NONEED, 30, 30, 0x79, 0x11, 10, 2000},
+	{0x12, "FT5436i", TPD_MAX_POINTS_5, AUTO_CLB_NONEED, 30, 30, 0x79, 0x11, 10, 2000},
+	{0x11, "FT5336i", TPD_MAX_POINTS_5, AUTO_CLB_NONEED, 30, 30, 0x79, 0x11, 10, 2000},
 };
 
 #define FT_STORE_TS_INFO(buf, id, name, max_tch, group_id, fw_vkey_support, \
-	fw_name, fw_maj, fw_min, fw_sub_min) \
-	snprintf(buf, FT_INFO_MAX_LEN, \
-		"controller\t= focaltech\n" \
-		"model\t\t= 0x%x\n" \
-		"name\t\t= %s\n" \
-		"max_touches\t= %d\n" \
-		"drv_ver\t\t= 0x%x\n" \
-		"group_id\t= 0x%x\n" \
-		"fw_vkey_support\t= %s\n" \
-		"fw_name\t\t= %s\n" \
-		"fw_ver\t\t= %d.%d.%d\n", id, name, \
-		max_tch, FT_DRIVER_VERSION, group_id, \
-		fw_vkey_support, fw_name, fw_maj, fw_min, \
-		fw_sub_min)
+			fw_name, fw_maj, fw_min, fw_sub_min) \
+			snprintf(buf, FT_INFO_MAX_LEN, \
+				"controller\t= focaltech\n" \
+				"model\t\t= 0x%x\n" \
+				"name\t\t= %s\n" \
+				"max_touches\t= %d\n" \
+				"drv_ver\t\t= 0x%x\n" \
+				"group_id\t= 0x%x\n" \
+				"fw_vkey_support\t= %s\n" \
+				"fw_name\t\t= %s\n" \
+				"fw_ver\t\t= %d.%d.%d\n", id, name, \
+				max_tch, FT_DRIVER_VERSION, group_id, \
+				fw_vkey_support, fw_name, fw_maj, fw_min, \
+				fw_sub_min)
 
 #if CTP_PROC_INTERFACE
 #define CTP_PARENT_PROC_NAME  "touchscreen"
 #define CTP_OPEN_PROC_NAME        "ctp_openshort_test"
 #define CTP_LOCKDOWN_INFOR_NAME   "lockdown_info"
 
+#define CTP_COLOR_INFOR_NAME   "panel_color"
+
+
+
+
+
 static struct semaphore g_device_mutex;
 
-static ssize_t ctp_open_proc_read(struct file *file, char __user *buf,
-				  size_t count, loff_t *ppos);
-static ssize_t ctp_open_proc_write(struct file *filp,
-				   const char __user *userbuf, size_t count,
-				   loff_t *ppos);
+static ssize_t ctp_open_proc_read(struct file *file, char __user *buf, size_t count, loff_t *ppos);
+static ssize_t ctp_open_proc_write(struct file *filp, const char __user *userbuf, size_t count, loff_t *ppos);
 static const struct file_operations ctp_open_procs_fops = {
 	.write = ctp_open_proc_write,
 	.read = ctp_open_proc_read,
 	.owner = THIS_MODULE,
 };
 
-static ssize_t ctp_lockdown_proc_read(struct file *file, char __user *buf,
-				      size_t count, loff_t *ppos);
-static ssize_t ctp_lockdown_proc_write(struct file *filp,
-				       const char __user *userbuf,
-				       size_t count, loff_t *ppos);
+static ssize_t ctp_lockdown_proc_read(struct file *file, char __user *buf, size_t count, loff_t *ppos);
+static ssize_t ctp_lockdown_proc_write(struct file *filp, const char __user *userbuf, size_t count, loff_t *ppos);
+
+static ssize_t ctp_color_proc_read(struct file *file, char __user *buf, size_t count, loff_t *ppos);
+static ssize_t ctp_color_proc_write(struct file *filp, const char __user *userbuf, size_t count, loff_t *ppos);
+
 static const struct file_operations ctp_lockdown_procs_fops = {
 	.write = ctp_lockdown_proc_write,
 	.read = ctp_lockdown_proc_read,
+	.owner = THIS_MODULE,
+};
+
+
+static const struct file_operations ctp_color_procs_fops = {
+	.write = ctp_color_proc_write,
+	.read = ctp_color_proc_read,
 	.owner = THIS_MODULE,
 };
 
@@ -157,6 +159,7 @@ extern int power_supply_get_battery_charge_state(struct power_supply *psy);
 static struct power_supply *batt_psy;
 static u8 is_charger_plug;
 static u8 pre_charger_status;
+
 #endif
 
 #if CTP_PROC_INTERFACE
@@ -165,24 +168,24 @@ static struct i2c_client *g_focalclient;
 
 #if CTP_PROC_INTERFACE
 static int focal_i2c_Read(unsigned char *writebuf,
-			  int writelen, unsigned char *readbuf, int readlen)
+		  int writelen, unsigned char *readbuf, int readlen)
 {
 	int ret;
 
 	if (writelen > 0) {
 		struct i2c_msg msgs[] = {
 			{
-			 .addr = g_focalclient->addr,
-			 .flags = 0,
-			 .len = writelen,
-			 .buf = writebuf,
-			 },
+			.addr = g_focalclient->addr,
+			.flags = 0,
+			.len = writelen,
+			.buf = writebuf,
+			},
 			{
-			 .addr = g_focalclient->addr,
-			 .flags = I2C_M_RD,
-			 .len = readlen,
-			 .buf = readbuf,
-			 },
+			.addr = g_focalclient->addr,
+			.flags = I2C_M_RD,
+			.len = readlen,
+			.buf = readbuf,
+			},
 		};
 		ret = i2c_transfer(g_focalclient->adapter, msgs, 2);
 		if (ret < 0)
@@ -191,16 +194,15 @@ static int focal_i2c_Read(unsigned char *writebuf,
 	} else {
 		struct i2c_msg msgs[] = {
 			{
-			 .addr = g_focalclient->addr,
-			 .flags = I2C_M_RD,
-			 .len = readlen,
-			 .buf = readbuf,
-			 },
+			.addr = g_focalclient->addr,
+			.flags = I2C_M_RD,
+			.len = readlen,
+			.buf = readbuf,
+			},
 		};
 		ret = i2c_transfer(g_focalclient->adapter, msgs, 1);
 		if (ret < 0)
-			dev_err(&g_focalclient->dev, "%s:i2c read error.\n",
-				__func__);
+			dev_err(&g_focalclient->dev, "%s:i2c read error.\n", __func__);
 	}
 	return ret;
 }
@@ -212,11 +214,11 @@ static int focal_i2c_Write(unsigned char *writebuf, int writelen)
 
 	struct i2c_msg msg[] = {
 		{
-		 .addr = g_focalclient->addr,
-		 .flags = 0,
-		 .len = writelen,
-		 .buf = writebuf,
-		 },
+		.addr = g_focalclient->addr,
+		.flags = 0,
+		.len = writelen,
+		.buf = writebuf,
+		},
 	};
 
 	ret = i2c_transfer(g_focalclient->adapter, msg, 1);
@@ -228,37 +230,36 @@ static int focal_i2c_Write(unsigned char *writebuf, int writelen)
 #endif
 
 static int ft5x06_i2c_read(struct i2c_client *client, char *writebuf,
-			   int writelen, char *readbuf, int readlen)
+						 int writelen, char *readbuf, int readlen)
 {
 	int ret;
 
 	if (writelen > 0) {
 		struct i2c_msg msgs[] = {
 			{
-			 .addr = client->addr,
-			 .flags = 0,
-			 .len = writelen,
-			 .buf = writebuf,
-			 },
+				.addr = client->addr,
+				.flags = 0,
+				.len = writelen,
+				.buf = writebuf,
+			},
 			{
-			 .addr = client->addr,
-			 .flags = I2C_M_RD,
-			 .len = readlen,
-			 .buf = readbuf,
-			 },
+				.addr = client->addr,
+				.flags = I2C_M_RD,
+				.len = readlen,
+				.buf = readbuf,
+			},
 		};
 		ret = i2c_transfer(client->adapter, msgs, 2);
 		if (ret < 0)
-			dev_err(&client->dev, "%s: i2c read error.\n",
-				__func__);
+			dev_err(&client->dev, "%s: i2c read error.\n", __func__);
 	} else {
 		struct i2c_msg msgs[] = {
 			{
-			 .addr = client->addr,
-			 .flags = I2C_M_RD,
-			 .len = readlen,
-			 .buf = readbuf,
-			 },
+				.addr = client->addr,
+				.flags = I2C_M_RD,
+				.len = readlen,
+				.buf = readbuf,
+			},
 		};
 		ret = i2c_transfer(client->adapter, msgs, 1);
 		if (ret < 0)
@@ -268,17 +269,16 @@ static int ft5x06_i2c_read(struct i2c_client *client, char *writebuf,
 }
 
 static int ft5x06_i2c_write(struct i2c_client *client, char *writebuf,
-			    int writelen)
-{
+							int writelen) {
 	int ret;
 
 	struct i2c_msg msgs[] = {
 		{
-		 .addr = client->addr,
-		 .flags = 0,
-		 .len = writelen,
-		 .buf = writebuf,
-		 },
+			.addr = client->addr,
+			.flags = 0,
+			.len = writelen,
+			.buf = writebuf,
+		},
 	};
 	ret = i2c_transfer(client->adapter, msgs, 1);
 	if (ret < 0)
@@ -289,7 +289,7 @@ static int ft5x06_i2c_write(struct i2c_client *client, char *writebuf,
 
 static int ft5x0x_write_reg(struct i2c_client *client, u8 addr, const u8 val)
 {
-	u8 buf[2] = { 0 };
+	u8 buf[2] = {0};
 
 	buf[0] = addr;
 	buf[1] = val;
@@ -336,7 +336,7 @@ static void ft5x06_update_fw_ver(struct ft5x06_ts_data *data)
 		dev_err(&client->dev, "fw sub minor version read failed");
 
 	dev_info(&client->dev, "Firmware version = %d.%d.%d\n",
-		 data->fw_ver[0], data->fw_ver[1], data->fw_ver[2]);
+			data->fw_ver[0], data->fw_ver[1], data->fw_ver[2]);
 }
 
 static irqreturn_t ft5x06_ts_interrupt(int irq, void *dev_id)
@@ -352,16 +352,20 @@ static irqreturn_t ft5x06_ts_interrupt(int irq, void *dev_id)
 		CTP_ERROR("%s: Invalid data\n", __func__);
 		return IRQ_HANDLED;
 	}
+
+
 #if CTP_CHARGER_DETECT
 	if (!batt_psy) {
+
 		batt_psy = power_supply_get_by_name("usb");
-	} else {
-		is_charger_plug =
-		    (u8) power_supply_get_battery_charge_state(batt_psy);
+	} else{
+		is_charger_plug = (u8)power_supply_get_battery_charge_state(batt_psy);
+
 
 		if (is_charger_plug != pre_charger_status) {
 			pre_charger_status = is_charger_plug;
 			ft5x0x_write_reg(update_client, 0x8B, is_charger_plug);
+
 		}
 	}
 
@@ -370,7 +374,8 @@ static irqreturn_t ft5x06_ts_interrupt(int irq, void *dev_id)
 	ip_dev = data->input_dev;
 	buf = data->tch_data;
 
-	rc = ft5x06_i2c_read(data->client, &reg, 1, buf, data->tch_data_len);
+	rc = ft5x06_i2c_read(data->client, &reg, 1,
+						buf, data->tch_data_len);
 	if (rc < 0) {
 		dev_err(&data->client->dev, "%s: read data fail\n", __func__);
 		return IRQ_HANDLED;
@@ -384,9 +389,9 @@ static irqreturn_t ft5x06_ts_interrupt(int irq, void *dev_id)
 		update_input = true;
 
 		x = (buf[FT_TOUCH_X_H_POS + FT_ONE_TCH_LEN * i] & 0x0F) << 8 |
-		    (buf[FT_TOUCH_X_L_POS + FT_ONE_TCH_LEN * i]);
+			(buf[FT_TOUCH_X_L_POS + FT_ONE_TCH_LEN * i]);
 		y = (buf[FT_TOUCH_Y_H_POS + FT_ONE_TCH_LEN * i] & 0x0F) << 8 |
-		    (buf[FT_TOUCH_Y_L_POS + FT_ONE_TCH_LEN * i]);
+			(buf[FT_TOUCH_Y_L_POS + FT_ONE_TCH_LEN * i]);
 
 		status = buf[FT_TOUCH_EVENT_POS + FT_ONE_TCH_LEN * i] >> 6;
 
@@ -397,9 +402,7 @@ static irqreturn_t ft5x06_ts_interrupt(int irq, void *dev_id)
 			break;
 
 		if (y == 2000) {
-
 			y = 1344;
-
 			switch (x) {
 			case 180:
 				x = 150;
@@ -452,14 +455,14 @@ static int ft5x06_power_on(struct ft5x06_ts_data *data, bool on)
 	rc = regulator_enable(data->vdd);
 	if (rc) {
 		dev_err(&data->client->dev,
-			"Regulator vdd enable failed rc=%d\n", rc);
+				"Regulator vdd enable failed rc=%d\n", rc);
 		return rc;
 	}
 
 	rc = regulator_enable(data->vcc_i2c);
 	if (rc) {
 		dev_err(&data->client->dev,
-			"Regulator vcc_i2c enable failed rc=%d\n", rc);
+				"Regulator vcc_i2c enable failed rc=%d\n", rc);
 		regulator_disable(data->vdd);
 	}
 
@@ -469,18 +472,18 @@ power_off:
 	rc = regulator_disable(data->vdd);
 	if (rc) {
 		dev_err(&data->client->dev,
-			"Regulator vdd disable failed rc=%d\n", rc);
+				"Regulator vdd disable failed rc=%d\n", rc);
 		return rc;
 	}
 
 	rc = regulator_disable(data->vcc_i2c);
 	if (rc) {
 		dev_err(&data->client->dev,
-			"Regulator vcc_i2c disable failed rc=%d\n", rc);
+				"Regulator vcc_i2c disable failed rc=%d\n", rc);
 		rc = regulator_enable(data->vdd);
 		if (rc) {
 			dev_err(&data->client->dev,
-				"Regulator vdd enable failed rc=%d\n", rc);
+					"Regulator vdd enable failed rc=%d\n", rc);
 		}
 	}
 
@@ -498,16 +501,16 @@ static int ft5x06_power_init(struct ft5x06_ts_data *data, bool on)
 	if (IS_ERR(data->vdd)) {
 		rc = PTR_ERR(data->vdd);
 		dev_err(&data->client->dev,
-			"Regulator get failed vdd rc=%d\n", rc);
+				"Regulator get failed vdd rc=%d\n", rc);
 		return rc;
 	}
 
 	if (regulator_count_voltages(data->vdd) > 0) {
 		rc = regulator_set_voltage(data->vdd, FT_VTG_MIN_UV,
-					   FT_VTG_MAX_UV);
+								 FT_VTG_MAX_UV);
 		if (rc) {
 			dev_err(&data->client->dev,
-				"Regulator set_vtg failed vdd rc=%d\n", rc);
+					"Regulator set_vtg failed vdd rc=%d\n", rc);
 			goto reg_vdd_put;
 		}
 	}
@@ -516,16 +519,16 @@ static int ft5x06_power_init(struct ft5x06_ts_data *data, bool on)
 	if (IS_ERR(data->vcc_i2c)) {
 		rc = PTR_ERR(data->vcc_i2c);
 		dev_err(&data->client->dev,
-			"Regulator get failed vcc_i2c rc=%d\n", rc);
+				"Regulator get failed vcc_i2c rc=%d\n", rc);
 		goto reg_vdd_set_vtg;
 	}
 
 	if (regulator_count_voltages(data->vcc_i2c) > 0) {
 		rc = regulator_set_voltage(data->vcc_i2c, FT_I2C_VTG_MIN_UV,
-					   FT_I2C_VTG_MAX_UV);
+								 FT_I2C_VTG_MAX_UV);
 		if (rc) {
 			dev_err(&data->client->dev,
-				"Regulator set_vtg failed vcc_i2c rc=%d\n", rc);
+					"Regulator set_vtg failed vcc_i2c rc=%d\n", rc);
 			goto reg_vcc_i2c_put;
 		}
 	}
@@ -554,29 +557,31 @@ pwr_deinit:
 	return 0;
 }
 
-static int ft5x06_ts_pinctrl_select(struct ft5x06_ts_data *ft5x06_data, bool on)
+static int ft5x06_ts_pinctrl_select(struct ft5x06_ts_data *ft5x06_data,
+									bool on)
 {
 	struct pinctrl_state *pins_state;
 	int ret;
 
 	pins_state = on ? ft5x06_data->gpio_state_active
-	    : ft5x06_data->gpio_state_suspend;
+				: ft5x06_data->gpio_state_suspend;
 	if (!IS_ERR_OR_NULL(pins_state)) {
 		ret = pinctrl_select_state(ft5x06_data->ts_pinctrl, pins_state);
 		if (ret) {
 			dev_err(&ft5x06_data->client->dev,
-				"can not set %s pins\n",
-				on ? "pmx_ts_active" : "pmx_ts_suspend");
+					"can not set %s pins\n",
+					on ? "pmx_ts_active" : "pmx_ts_suspend");
 			return ret;
 		}
 	} else {
 		dev_err(&ft5x06_data->client->dev,
-			"not a valid '%s' pinstate\n",
-			on ? "pmx_ts_active" : "pmx_ts_suspend");
+				"not a valid '%s' pinstate\n",
+				on ? "pmx_ts_active" : "pmx_ts_suspend");
 	}
 
 	return 0;
 }
+
 
 #ifdef CONFIG_PM
 static int ft5x06_ts_suspend(struct device *dev)
@@ -609,8 +614,10 @@ static int ft5x06_ts_suspend(struct device *dev)
 		txbuf[0] = FT_REG_PMODE;
 		txbuf[1] = FT_PMODE_HIBERNATE;
 		err = ft5x06_i2c_write(data->client, txbuf, sizeof(txbuf));
+
 		msleep(data->pdata->hard_rst_dly);
 	}
+
 
 	if (data->pdata->power_on) {
 		err = data->pdata->power_on(false);
@@ -629,6 +636,7 @@ static int ft5x06_ts_suspend(struct device *dev)
 	data->suspended = true;
 
 	return 0;
+
 
 pwr_off_fail:
 	if (gpio_is_valid(data->pdata->reset_gpio)) {
@@ -650,6 +658,7 @@ static int ft5x06_ts_resume(struct device *dev)
 		dev_dbg(dev, "Already in awake state\n");
 		return 0;
 	}
+
 
 	if (data->pdata->power_on) {
 		err = data->pdata->power_on(true);
@@ -680,11 +689,9 @@ static int ft5x06_ts_resume(struct device *dev)
 	if (!batt_psy)
 		CTP_ERROR("tp resume battery supply not found\n");
 	else {
-		is_charger_plug =
-		    (u8) power_supply_get_battery_charge_state(batt_psy);
+		is_charger_plug = (u8)power_supply_get_battery_charge_state(batt_psy);
 
-		CTP_DEBUG("is_charger_plug %d, prev %d", is_charger_plug,
-			  pre_charger_status);
+		CTP_DEBUG("is_charger_plug %d, prev %d", is_charger_plug, pre_charger_status);
 		if (is_charger_plug) {
 			ft5x0x_write_reg(update_client, 0x8B, 1);
 		} else {
@@ -693,6 +700,7 @@ static int ft5x06_ts_resume(struct device *dev)
 	}
 	pre_charger_status = is_charger_plug;
 #endif
+
 
 	data->suspended = false;
 
@@ -724,20 +732,19 @@ static int ft5x06_ts_resume(struct device *dev)
 static void fb_notify_resume_work(struct work_struct *work)
 {
 	struct ft5x06_ts_data *ft5x06_data =
-	    container_of(work, struct ft5x06_ts_data, fb_notify_work);
+			 container_of(work, struct ft5x06_ts_data, fb_notify_work);
 	ft5x06_ts_resume(&ft5x06_data->client->dev);
 }
-
 static int fb_notifier_callback(struct notifier_block *self,
-				unsigned long event, void *data)
+								unsigned long event, void *data)
 {
 	struct fb_event *evdata = data;
 	int *blank;
 	struct ft5x06_ts_data *ft5x06_data =
-	    container_of(self, struct ft5x06_ts_data, fb_notif);
+		container_of(self, struct ft5x06_ts_data, fb_notif);
 
 	if (evdata && evdata->data && event == FB_EVENT_BLANK &&
-	    ft5x06_data && ft5x06_data->client) {
+		ft5x06_data && ft5x06_data->client) {
 		blank = evdata->data;
 		if (*blank == FB_BLANK_UNBLANK
 				|| *blank == FB_BLANK_NORMAL
@@ -755,8 +762,8 @@ static int fb_notifier_callback(struct notifier_block *self,
 static void ft5x06_ts_early_suspend(struct early_suspend *handler)
 {
 	struct ft5x06_ts_data *data = container_of(handler,
-						   struct ft5x06_ts_data,
-						   early_suspend);
+								struct ft5x06_ts_data,
+								early_suspend);
 
 	ft5x06_ts_suspend(&data->client->dev);
 }
@@ -764,22 +771,22 @@ static void ft5x06_ts_early_suspend(struct early_suspend *handler)
 static void ft5x06_ts_late_resume(struct early_suspend *handler)
 {
 	struct ft5x06_ts_data *data = container_of(handler,
-						   struct ft5x06_ts_data,
-						   early_suspend);
+								struct ft5x06_ts_data,
+								early_suspend);
 
 	ft5x06_ts_resume(&data->client->dev);
 }
 #endif
 
 static int ft5x06_fw_upgrade_start(struct i2c_client *client,
-				   const u8 *data, u32 data_len)
+								 const u8 *data, u32 data_len)
 {
 	struct ft5x06_ts_data *ts_data = i2c_get_clientdata(client);
 	struct fw_upgrade_info info = ts_data->pdata->info;
+
 	u8 reg_addr;
 	u8 chip_id = 0x00;
-	u8 w_buf[FT_MAX_WR_BUF] = { 0 }, r_buf[FT_MAX_RD_BUF] = {
-	0};
+	u8 w_buf[FT_MAX_WR_BUF] = {0}, r_buf[FT_MAX_RD_BUF] = {0};
 	u8 pkt_buf[FT_FW_PKT_LEN + FT_FW_PKT_META_LEN];
 	int i, j, temp;
 	u32 pkt_num, pkt_len;
@@ -787,6 +794,8 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 	u8 is_5336_fwsize_30 = false;
 	u8 fw_ecc;
 
+
+#if 1
 	reg_addr = FT_REG_ID;
 	temp = ft5x06_i2c_read(client, &reg_addr, 1, &chip_id, 1);
 	if (temp < 0) {
@@ -797,14 +806,12 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 		chip_id = CTP_IC_TYPE_1;
 
 	}
-	for (i = 0; i < sizeof(fts_updateinfo) / sizeof(struct Upgrade_Info);
-	     i++) {
+	for (i = 0; i < sizeof(fts_updateinfo)/sizeof(struct Upgrade_Info); i++) {
 		if (chip_id == fts_updateinfo[i].CHIP_ID) {
 			info.auto_cal = fts_updateinfo[i].AUTO_CLB;
 			info.delay_55 = fts_updateinfo[i].delay_55;
 			info.delay_aa = fts_updateinfo[i].delay_aa;
-			info.delay_erase_flash =
-			    fts_updateinfo[i].delay_earse_flash;
+			info.delay_erase_flash = fts_updateinfo[i].delay_earse_flash;
 			info.delay_readid = fts_updateinfo[i].delay_readid;
 			info.upgrade_id_1 = fts_updateinfo[i].upgrade_id_1;
 			info.upgrade_id_2 = fts_updateinfo[i].upgrade_id_2;
@@ -813,9 +820,9 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 		}
 	}
 
-	ts_data->family_id = chip_id;
+			ts_data->family_id = chip_id;
 
-	if (i >= sizeof(fts_updateinfo) / sizeof(struct Upgrade_Info)) {
+	if (i >= sizeof(fts_updateinfo)/sizeof(struct Upgrade_Info)) {
 		info.auto_cal = fts_updateinfo[7].AUTO_CLB;
 		info.delay_55 = fts_updateinfo[7].delay_55;
 		info.delay_aa = fts_updateinfo[7].delay_aa;
@@ -824,15 +831,17 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 		info.upgrade_id_1 = fts_updateinfo[7].upgrade_id_1;
 		info.upgrade_id_2 = fts_updateinfo[7].upgrade_id_2;
 	}
+#endif
 
 	CTP_DEBUG("enter fw_upgrade_start");
 	dev_err(&client->dev, "id1 = 0x%x id2 = 0x%x family_id=0x%x\n",
-		info.upgrade_id_1, info.upgrade_id_2, ts_data->family_id);
+			info.upgrade_id_1, info.upgrade_id_2, ts_data->family_id);
 	/* determine firmware size */
 	if (*(data + data_len - FT_BLOADER_SIZE_OFF) == FT_BLOADER_NEW_SIZE)
 		is_5336_fwsize_30 = true;
 	else
 		is_5336_fwsize_30 = false;
+
 
 	for (i = 0, j = 0; i < FT_UPGRADE_LOOP; i++) {
 		msleep(FT_EARSE_DLY_MS);
@@ -866,11 +875,10 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 
 		CTP_DEBUG("%X, %X", r_buf[0], r_buf[1]);
 		if (r_buf[0] != info.upgrade_id_1
-		    || r_buf[1] != info.upgrade_id_2) {
-			dev_err(&client->dev,
-				"Upgrade ID mismatch(%d), IC=0x%x 0x%x, info=0x%x 0x%x\n",
-				i, r_buf[0], r_buf[1], info.upgrade_id_1,
-				info.upgrade_id_2);
+			|| r_buf[1] != info.upgrade_id_2) {
+			dev_err(&client->dev, "Upgrade ID mismatch(%d), IC=0x%x 0x%x, info=0x%x 0x%x\n",
+					i, r_buf[0], r_buf[1],
+					info.upgrade_id_1, info.upgrade_id_2);
 		} else
 			break;
 	}
@@ -888,17 +896,16 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 	else if (r_buf[0] == 7)
 		is_5336_new_bootloader = FT_BLOADER_VERSION_Z7;
 	else if (r_buf[0] >= 0x0f &&
-		 ((ts_data->family_id == FT_FT5336_FAMILY_ID_0x11) ||
-		  (ts_data->family_id == FT_FT5336_FAMILY_ID_0x12) ||
-		  (ts_data->family_id == FT_FT5336_FAMILY_ID_0x13) ||
-		  (ts_data->family_id == FT_FT5336_FAMILY_ID_0x14)))
+			((ts_data->family_id == FT_FT5336_FAMILY_ID_0x11) ||
+			(ts_data->family_id == FT_FT5336_FAMILY_ID_0x12) ||
+			(ts_data->family_id == FT_FT5336_FAMILY_ID_0x13) ||
+			(ts_data->family_id == FT_FT5336_FAMILY_ID_0x14)))
 		is_5336_new_bootloader = FT_BLOADER_VERSION_GZF;
 	else
 		is_5336_new_bootloader = FT_BLOADER_VERSION_LZ4;
 
-	dev_dbg(&client->dev,
-		"bootloader type=%d, r_buf=0x%x, family_id=0x%x\n",
-		is_5336_new_bootloader, r_buf[0], ts_data->family_id);
+	dev_dbg(&client->dev, "bootloader type=%d, r_buf=0x%x, family_id=0x%x\n",
+			is_5336_new_bootloader, r_buf[0], ts_data->family_id);
 
 	/* erase app and panel paramenter area */
 	w_buf[0] = FT_ERASE_APP_REG;
@@ -913,7 +920,7 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 
 	/* program firmware */
 	if (is_5336_new_bootloader == FT_BLOADER_VERSION_LZ4
-	    || is_5336_new_bootloader == FT_BLOADER_VERSION_Z7)
+		|| is_5336_new_bootloader == FT_BLOADER_VERSION_Z7)
 		data_len = data_len - FT_DATA_LEN_OFF_OLD_FW;
 	else
 		data_len = data_len - FT_DATA_LEN_OFF_NEW_FW;
@@ -937,7 +944,7 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 		}
 
 		ft5x06_i2c_write(client, pkt_buf,
-				 FT_FW_PKT_LEN + FT_FW_PKT_META_LEN);
+						FT_FW_PKT_LEN + FT_FW_PKT_META_LEN);
 		msleep(FT_FW_PKT_DLY_MS);
 	}
 
@@ -961,23 +968,23 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 
 	/* send the finishing packet */
 	if (is_5336_new_bootloader == FT_BLOADER_VERSION_LZ4 ||
-	    is_5336_new_bootloader == FT_BLOADER_VERSION_Z7) {
+		is_5336_new_bootloader == FT_BLOADER_VERSION_Z7) {
 		for (i = 0; i < FT_FINISHING_PKT_LEN_OLD_FW; i++) {
-			if (is_5336_new_bootloader == FT_BLOADER_VERSION_Z7)
+			if (is_5336_new_bootloader  == FT_BLOADER_VERSION_Z7)
 				temp = FT_MAGIC_BLOADER_Z7 + i;
 			else if (is_5336_new_bootloader ==
-				 FT_BLOADER_VERSION_LZ4)
+					FT_BLOADER_VERSION_LZ4)
 				temp = FT_MAGIC_BLOADER_LZ4 + i;
-			pkt_buf[2] = (u8) (temp >> 8);
-			pkt_buf[3] = (u8) temp;
+			pkt_buf[2] = (u8)(temp >> 8);
+			pkt_buf[3] = (u8)temp;
 			temp = 1;
-			pkt_buf[4] = (u8) (temp >> 8);
-			pkt_buf[5] = (u8) temp;
+			pkt_buf[4] = (u8)(temp >> 8);
+			pkt_buf[5] = (u8)temp;
 			pkt_buf[6] = data[data_len + i];
 			fw_ecc ^= pkt_buf[6];
 
 			ft5x06_i2c_write(client,
-					 pkt_buf, temp + FT_FW_PKT_META_LEN);
+							pkt_buf, temp + FT_FW_PKT_META_LEN);
 			msleep(FT_FW_PKT_DLY_MS);
 		}
 	} else if (is_5336_new_bootloader == FT_BLOADER_VERSION_GZF) {
@@ -986,16 +993,16 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 				temp = FT_MAGIC_BLOADER_GZF_30 + i;
 			else
 				temp = FT_MAGIC_BLOADER_GZF + i;
-			pkt_buf[2] = (u8) (temp >> 8);
-			pkt_buf[3] = (u8) temp;
+			pkt_buf[2] = (u8)(temp >> 8);
+			pkt_buf[3] = (u8)temp;
 			temp = 1;
-			pkt_buf[4] = (u8) (temp >> 8);
-			pkt_buf[5] = (u8) temp;
+			pkt_buf[4] = (u8)(temp >> 8);
+			pkt_buf[5] = (u8)temp;
 			pkt_buf[6] = data[data_len + i];
 			fw_ecc ^= pkt_buf[6];
 
 			ft5x06_i2c_write(client,
-					 pkt_buf, temp + FT_FW_PKT_META_LEN);
+							pkt_buf, temp + FT_FW_PKT_META_LEN);
 			msleep(FT_FW_PKT_DLY_MS);
 
 		}
@@ -1006,7 +1013,7 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 	ft5x06_i2c_read(client, w_buf, 1, r_buf, 1);
 	if (r_buf[0] != fw_ecc) {
 		dev_err(&client->dev, "ECC error! dev_ecc=%02x fw_ecc=%02x\n",
-			r_buf[0], fw_ecc);
+				r_buf[0], fw_ecc);
 		return -EIO;
 	}
 
@@ -1020,16 +1027,18 @@ static int ft5x06_fw_upgrade_start(struct i2c_client *client,
 	return 0;
 }
 
-static void fts_ctpm_read_lockdown(struct i2c_client *client,
-				   struct ft5x06_ts_data *data)
+static void fts_ctpm_read_lockdown(struct i2c_client *client, struct ft5x06_ts_data *data)
 {
 	u8 buf[128];
 	u8 w_buf[4], r_buf[2];
 	u32 i = 0, j = 0;
 	u32 k = 0;
 	struct ft5x06_ts_data *ts_data = i2c_get_clientdata(client);
+
+
 	for (i = 0, j = 0; i < FT_UPGRADE_LOOP; i++) {
 		msleep(FT_EARSE_DLY_MS);
+
 
 		if (gpio_is_valid(ts_data->pdata->reset_gpio)) {
 			gpio_set_value_cansleep(ts_data->pdata->reset_gpio, 0);
@@ -1043,10 +1052,10 @@ static void fts_ctpm_read_lockdown(struct i2c_client *client,
 			msleep(30 - (i - (FT_UPGRADE_LOOP / 2)) * 2);
 
 		/* Enter upgrade mode */
-		w_buf[0] = FT_UPGRADE_55;
+			w_buf[0] = FT_UPGRADE_55;
 		ft5x06_i2c_write(client, &w_buf[0], 1);
 		usleep(FT_55_AA_DLY_NS);
-		w_buf[0] = FT_UPGRADE_AA;
+			w_buf[0] = FT_UPGRADE_AA;
 		ft5x06_i2c_write(client, &w_buf[0], 1);
 
 		/* check READ_ID */
@@ -1063,12 +1072,13 @@ static void fts_ctpm_read_lockdown(struct i2c_client *client,
 		} else
 			break;
 	}
-/*--------- read current project setting  ---------- */
+	/*--------- read current project setting  ---------- */
 	/*set read start address */
+
 	buf[0] = 0x03;
 	buf[1] = 0x00;
-	buf[2] = (u8) (0x07d0 >> 8);
-	buf[3] = (u8) (0x07d0);
+	buf[2] = (u8)(0x07d0 >> 8);
+	buf[3] = (u8)(0x07d0);
 
 	ft5x06_i2c_read(client, buf, 4, data->lockdown_info, 8);
 	msleep(10);
@@ -1081,19 +1091,19 @@ static void fts_ctpm_read_lockdown(struct i2c_client *client,
 
 	msleep(200);
 
-	for (k = 0; k < FT_LOCKDOWN_SIZE; k++) {
+	for (k = 0 ; k < FT_LOCKDOWN_SIZE; k++) {
 
-		lockdown_info[k] = data->lockdown_info[k];
+	lockdown_info[k] = data->lockdown_info[k];
 	}
 
-	tp_color = lockdown_info[2];
-	TP_Maker = lockdown_info[0];
+	tp_color =  lockdown_info[2];
+		TP_Maker = lockdown_info[0];
 	LCD_Maker = lockdown_info[1];
-	dev_info(&client->dev,
-		 "Lockdown info: %02X %02X %02X %02X %02X %02X %02X %02X",
-		 lockdown_info[0], lockdown_info[1], lockdown_info[2],
-		 lockdown_info[3], lockdown_info[4], lockdown_info[5],
-		 lockdown_info[6], lockdown_info[7]);
+	dev_info(&client->dev, "Lockdown info: %02X %02X %02X %02X %02X %02X %02X %02X",
+				 lockdown_info[0], lockdown_info[1],
+				 lockdown_info[2], lockdown_info[3],
+				 lockdown_info[4], lockdown_info[5],
+				 lockdown_info[6], lockdown_info[7]);
 }
 
 #if TPD_AUTO_UPGRADE
@@ -1121,7 +1131,7 @@ static unsigned char CTPM_FW3[] = {
 static int fts_ctpm_fw_upgrade_with_i_file(struct ft5x06_ts_data *data)
 {
 	struct i2c_client *client = data->client;
-	int flag_TPID = 0;
+	int  flag_TPID = 0;
 	u8 *pbt_buf = 0x0;
 	int rc = 0, fw_len = 0;
 	u8 uc_host_fm_ver, uc_tp_fm_ver, vendor_id, ic_type;
@@ -1134,12 +1144,11 @@ static int fts_ctpm_fw_upgrade_with_i_file(struct ft5x06_ts_data *data)
 	reg_addr = 0xA3;
 	ft5x06_i2c_read(client, &reg_addr, 1, &ic_type, 1);
 
-	CTP_DEBUG("Vendor ID:0x%02X, TP FW:0x%02X, IC TYPE:%d", vendor_id,
-		  uc_tp_fm_ver, ic_type);
+	CTP_DEBUG("Vendor ID:0x%02X, TP FW:0x%02X, IC TYPE:%d", vendor_id, uc_tp_fm_ver, ic_type);
 
-	if (vendor_id == 0xA8 || vendor_id == 0x00 || ic_type == 0xA3
-	    || ic_type == 0x00) {
+	if (vendor_id == 0xA8 || vendor_id == 0x00 || ic_type == 0xA3 || ic_type == 0x00) {
 		CTP_ERROR("vend_id read error,need project");
+
 		fts_ctpm_read_lockdown(client, data);
 		flag_TPID = 1;
 		is_ic_update_crash = 1;
@@ -1181,20 +1190,17 @@ static int fts_ctpm_fw_upgrade_with_i_file(struct ft5x06_ts_data *data)
 	}
 
 	if ((pbt_buf[fw_len - 8] ^ pbt_buf[fw_len - 6]) == 0xFF
-	    && (pbt_buf[fw_len - 7] ^ pbt_buf[fw_len - 5]) == 0xFF
-	    && (pbt_buf[fw_len - 3] ^ pbt_buf[fw_len - 4]) == 0xFF) {
+		&& (pbt_buf[fw_len - 7] ^ pbt_buf[fw_len - 5]) == 0xFF
+		&& (pbt_buf[fw_len - 3] ^ pbt_buf[fw_len - 4]) == 0xFF) {
 
 		uc_host_fm_ver = pbt_buf[fw_len - 2];
 		CTP_DEBUG("[FTS] uc_tp_fm_ver = %d.\n", uc_tp_fm_ver);
 		CTP_DEBUG("[FTS] uc_host_fm_ver = %d.\n", uc_host_fm_ver);
 
-		if ((uc_tp_fm_ver < uc_host_fm_ver)
-		    || (is_ic_update_crash == 1)) {
-			rc = ft5x06_fw_upgrade_start(update_client, pbt_buf,
-						     fw_len);
+		if ((uc_tp_fm_ver < uc_host_fm_ver) || (is_ic_update_crash == 1)) {
+			rc = ft5x06_fw_upgrade_start(update_client, pbt_buf, fw_len);
 			if (rc != 0) {
-				CTP_DEBUG("[FTS]  upgrade failed rc = %d.\n",
-					  rc);
+				CTP_DEBUG("[FTS]  upgrade failed rc = %d.\n", rc);
 			} else {
 				CTP_DEBUG("[FTS] upgrade successfully.\n");
 			}
@@ -1207,17 +1213,18 @@ static int fts_ctpm_fw_upgrade_with_i_file(struct ft5x06_ts_data *data)
 
 #if CTP_SYS_APK_UPDATE
 static ssize_t ft5x06_fw_name_show(struct device *dev,
-				   struct device_attribute *attr, char *buf)
+								 struct device_attribute *attr, char *buf)
 {
 	u8 fw_version = 0x00;
+
 	ft5x0x_read_reg(update_client, FT5x0x_REG_FW_VER, &fw_version);
 
 	return sprintf(buf, "firmware version %02X\n", fw_version);
 }
 
 static ssize_t ft5x06_fw_name_store(struct device *dev,
-				    struct device_attribute *attr,
-				    const char *buf, size_t size)
+									struct device_attribute *attr,
+									const char *buf, size_t size)
 {
 	struct ft5x06_ts_data *data = dev_get_drvdata(dev);
 
@@ -1225,8 +1232,8 @@ static ssize_t ft5x06_fw_name_store(struct device *dev,
 		return -EINVAL;
 
 	strlcpy(data->fw_name, buf, size);
-	if (data->fw_name[size - 1] == '\n')
-		data->fw_name[size - 1] = 0;
+	if (data->fw_name[size-1] == '\n')
+		data->fw_name[size-1] = 0;
 
 	return size;
 }
@@ -1258,7 +1265,6 @@ static int ft5x06_auto_cal(struct i2c_client *client)
 	ft5x0x_write_reg(client, FT_REG_DEV_MODE, FT_FACTORYMODE_VALUE);
 	msleep(data->pdata->soft_rst_dly);
 
-	/* store calibration data */
 	ft5x0x_write_reg(client, FT_DEV_MODE_REG_CAL, FT_CAL_STORE);
 	msleep(2 * data->pdata->soft_rst_dly);
 
@@ -1268,6 +1274,7 @@ static int ft5x06_auto_cal(struct i2c_client *client)
 
 	return 0;
 }
+
 
 static int ft5x06_fw_upgrade(struct device *dev, bool force)
 {
@@ -1285,7 +1292,7 @@ static int ft5x06_fw_upgrade(struct device *dev, bool force)
 	rc = request_firmware(&fw, data->fw_name, dev);
 	if (rc < 0) {
 		dev_err(dev, "Request firmware failed - %s (%d)\n",
-			data->fw_name, rc);
+						data->fw_name, rc);
 		return rc;
 	}
 
@@ -1306,14 +1313,14 @@ static int ft5x06_fw_upgrade(struct device *dev, bool force)
 	fw_file_sub_min = FT_FW_FILE_SUB_MIN_VER(fw);
 
 	dev_info(dev, "Current firmware: %d.%d.%d", data->fw_ver[0],
-		 data->fw_ver[1], data->fw_ver[2]);
+				data->fw_ver[1], data->fw_ver[2]);
 	dev_info(dev, "New firmware: %d.%d.%d", fw_file_maj,
-		 fw_file_min, fw_file_sub_min);
+				fw_file_min, fw_file_sub_min);
 
 	if (force)
 		fw_upgrade = true;
 	else if ((data->fw_ver[0] < fw_file_maj) &&
-		 data->fw_vendor_id == fw_file_vendor_id)
+		data->fw_vendor_id == fw_file_vendor_id)
 		fw_upgrade = true;
 
 	if (!fw_upgrade) {
@@ -1337,25 +1344,26 @@ static int ft5x06_fw_upgrade(struct device *dev, bool force)
 	ft5x06_update_fw_ver(data);
 
 	FT_STORE_TS_INFO(data->ts_info, data->family_id, data->pdata->name,
-			 data->pdata->num_max_touches, data->pdata->group_id,
-			 data->pdata->fw_vkey_support ? "yes" : "no",
-			 data->pdata->fw_name, data->fw_ver[0],
-			 data->fw_ver[1], data->fw_ver[2]);
+			data->pdata->num_max_touches, data->pdata->group_id,
+			data->pdata->fw_vkey_support ? "yes" : "no",
+			data->pdata->fw_name, data->fw_ver[0],
+			data->fw_ver[1], data->fw_ver[2]);
 rel_fw:
 	release_firmware(fw);
 	return rc;
 }
 
+
 static ssize_t ft5x06_update_fw_show(struct device *dev,
-				     struct device_attribute *attr, char *buf)
+				struct device_attribute *attr, char *buf)
 {
 	struct ft5x06_ts_data *data = dev_get_drvdata(dev);
 	return snprintf(buf, 2, "%d\n", data->loading_fw);
 }
 
 static ssize_t ft5x06_update_fw_store(struct device *dev,
-				      struct device_attribute *attr,
-				      const char *buf, size_t size)
+				struct device_attribute *attr,
+				const char *buf, size_t size)
 {
 	struct ft5x06_ts_data *data = dev_get_drvdata(dev);
 	unsigned long val;
@@ -1374,7 +1382,7 @@ static ssize_t ft5x06_update_fw_store(struct device *dev,
 	}
 
 	mutex_lock(&data->input_dev->mutex);
-	if (!data->loading_fw && val) {
+	if (!data->loading_fw  && val) {
 		data->loading_fw = true;
 		ft5x06_fw_upgrade(dev, false);
 		data->loading_fw = false;
@@ -1385,11 +1393,11 @@ static ssize_t ft5x06_update_fw_store(struct device *dev,
 }
 
 static DEVICE_ATTR(update_fw, 0664, ft5x06_update_fw_show,
-		   ft5x06_update_fw_store);
+				ft5x06_update_fw_store);
 
 static ssize_t ft5x06_force_update_fw_store(struct device *dev,
-					    struct device_attribute *attr,
-					    const char *buf, size_t size)
+				struct device_attribute *attr,
+				const char *buf, size_t size)
 {
 	struct ft5x06_ts_data *data = dev_get_drvdata(dev);
 	unsigned long val;
@@ -1403,7 +1411,7 @@ static ssize_t ft5x06_force_update_fw_store(struct device *dev,
 		return rc;
 
 	mutex_lock(&data->input_dev->mutex);
-	if (!data->loading_fw && val) {
+	if (!data->loading_fw  && val) {
 		data->loading_fw = true;
 		ft5x06_fw_upgrade(dev, true);
 		data->loading_fw = false;
@@ -1414,7 +1422,8 @@ static ssize_t ft5x06_force_update_fw_store(struct device *dev,
 }
 
 static DEVICE_ATTR(force_update_fw, 0664, ft5x06_update_fw_show,
-		   ft5x06_force_update_fw_store);
+				ft5x06_force_update_fw_store);
+
 
 #define FT_DEBUG_DIR_NAME	"ts_debug"
 
@@ -1436,7 +1445,7 @@ static int ft5x06_debug_data_set(void *_data, u64 val)
 
 	if (ft5x06_debug_addr_is_valid(data->addr))
 		dev_info(&data->client->dev,
-			 "Writing into FT registers not supported\n");
+			"Writing into FT registers not supported\n");
 
 	mutex_unlock(&data->input_dev->mutex);
 
@@ -1544,10 +1553,10 @@ static int debugfs_dump_info_open(struct inode *inode, struct file *file)
 }
 
 static const struct file_operations debug_dump_info_fops = {
-	.owner = THIS_MODULE,
-	.open = debugfs_dump_info_open,
-	.read = seq_read,
-	.release = single_release,
+	.owner		= THIS_MODULE,
+	.open		= debugfs_dump_info_open,
+	.read		= seq_read,
+	.release	= single_release,
 };
 
 #endif
@@ -1600,6 +1609,7 @@ static int ft5x0x_ReadFirmware(char *firmware_name, unsigned char *firmware_buf)
 	inode = pfile->f_dentry->d_inode;
 	magic = inode->i_sb->s_magic;
 	fsize = inode->i_size;
+
 	old_fs = get_fs();
 	set_fs(KERNEL_DS);
 	pos = 0;
@@ -1611,7 +1621,7 @@ static int ft5x0x_ReadFirmware(char *firmware_name, unsigned char *firmware_buf)
 	return 0;
 }
 
-static void delay_qt_ms(unsigned long w_ms)
+static void delay_qt_ms(unsigned long  w_ms)
 {
 	unsigned long i;
 	unsigned long j;
@@ -1626,7 +1636,7 @@ static void delay_qt_ms(unsigned long w_ms)
 static int fts_ctpm_auto_clb(void)
 {
 	unsigned char uc_temp;
-	unsigned char i;
+	unsigned char i ;
 
 	printk("[FTS] start auto CLB.\n");
 	msleep(200);
@@ -1636,8 +1646,9 @@ static int fts_ctpm_auto_clb(void)
 	delay_qt_ms(300);
 	for (i = 0; i < 100; i++) {
 		ft5x0x_read_reg(update_client, 0, &uc_temp);
-		if (((uc_temp & 0x70) >> 4) == 0x0)
+		if (((uc_temp&0x70)>>4) == 0x0) {
 			break;
+		}
 		delay_qt_ms(200);
 		printk("[FTS] waiting calibration %d\n", i);
 	}
@@ -1655,6 +1666,7 @@ static int fts_ctpm_auto_clb(void)
 	return 0;
 }
 
+
 static int fts_ctpm_fw_upgrade_with_app_file(char *firmware_name)
 {
 	unsigned char *pbt_buf = NULL;
@@ -1667,35 +1679,34 @@ static int fts_ctpm_fw_upgrade_with_app_file(char *firmware_name)
 		CTP_ERROR("%s ERROR:Get firmware size failed\n", __FUNCTION__);
 		return -EPERM;
 	}
-	/*=========FW upgrade========================*/
-	pbt_buf = (unsigned char *)kmalloc(fwsize + 1, GFP_ATOMIC);
+
+	pbt_buf = (unsigned char *) kmalloc(fwsize+1, GFP_ATOMIC);
 	if (ft5x0x_ReadFirmware(firmware_name, pbt_buf)) {
-		CTP_ERROR("%s() - ERROR: request_firmware failed\n",
-			  __FUNCTION__);
+		CTP_ERROR("%s() - ERROR: request_firmware failed\n", __FUNCTION__);
 		kfree(pbt_buf);
 		return -EPERM;
 	}
 
+
+
 	if ((pbt_buf[fwsize - 8] ^ pbt_buf[fwsize - 6]) != 0xFF
-	    || (pbt_buf[fwsize - 7] ^ pbt_buf[fwsize - 5]) != 0xFF
-	    || (pbt_buf[fwsize - 3] ^ pbt_buf[fwsize - 4]) != 0xFF) {
+	 || (pbt_buf[fwsize - 7] ^ pbt_buf[fwsize - 5]) != 0xFF
+	 || (pbt_buf[fwsize - 3] ^ pbt_buf[fwsize - 4]) != 0xFF) {
 		CTP_ERROR("the update file is not correct, please check\n");
-		CTP_ERROR("checksum is %2x,%2x,%2x,%2x,%2x,%2x",
-			  pbt_buf[fwsize - 8], pbt_buf[fwsize - 6],
-			  pbt_buf[fwsize - 7], pbt_buf[fwsize - 5],
-			  pbt_buf[fwsize - 3], pbt_buf[fwsize - 4]);
-		return -EPERM;
+	CTP_ERROR("checksum is %2x, %2x, %2x, %2x, %2x, %2x", pbt_buf[fwsize - 8], pbt_buf[fwsize - 6], pbt_buf[fwsize - 7], pbt_buf[fwsize - 5], pbt_buf[fwsize - 3], pbt_buf[fwsize - 4]);
+	return -EPERM;
 	}
-	/*call the upgrade function */
-	i_ret = ft5x06_fw_upgrade_start(update_client, pbt_buf, fwsize);
+	/*call the upgrade function*/
+	i_ret =  ft5x06_fw_upgrade_start(update_client, pbt_buf, fwsize);
 	if (i_ret != 0) {
-		CTP_ERROR("%s() - ERROR:[FTS] upgrade failed i_ret = %d.\n",
-			  __FUNCTION__, i_ret);
+		CTP_ERROR("%s() - ERROR:[FTS] upgrade failed i_ret = %d.\n", __FUNCTION__,  i_ret);
+
+
 	} else {
 		CTP_INFO("[FTS] upgrade successfully.\n");
-		if (ft5x0x_read_reg(update_client, FT5x0x_REG_FW_VER, &fwver) >=
-		    0)
+		if (ft5x0x_read_reg(update_client, FT5x0x_REG_FW_VER, &fwver) >= 0)
 			CTP_INFO("the new fw ver is 0x%02x\n", fwver);
+
 	}
 	kfree(pbt_buf);
 	return i_ret;
@@ -1704,8 +1715,7 @@ static int fts_ctpm_fw_upgrade_with_app_file(char *firmware_name)
 #if CTP_SYS_APK_UPDATE
 
 static ssize_t ft5x0x_fwupgradeapp_show(struct device *dev,
-					struct device_attribute *attr,
-					char *buf)
+									  struct device_attribute *attr, char *buf)
 {
 	/* place holder for future use */
 	return -EPERM;
@@ -1713,16 +1723,19 @@ static ssize_t ft5x0x_fwupgradeapp_show(struct device *dev,
 #endif
 
 #if  CTP_SYS_APK_UPDATE
+
 static ssize_t ft5x0x_fwupgradeapp_store(struct device *dev,
-					 struct device_attribute *attr,
-					 const char *buf, size_t count)
+		struct device_attribute *attr,
+		const char *buf, size_t count)
 {
+
+
 	struct i2c_client *client = container_of(dev, struct i2c_client, dev);
 
 	char fwname[128];
 	memset(fwname, 0, sizeof(fwname));
 	sprintf(fwname, "%s", buf);
-	fwname[count - 1] = '\0';
+	fwname[count-1] = '\0';
 
 	disable_irq(client->irq);
 
@@ -1737,8 +1750,7 @@ static ssize_t ft5x0x_fwupgradeapp_store(struct device *dev,
 
 #if CTP_SYS_APK_UPDATE
 
-static DEVICE_ATTR(ftsfwupgradeapp, S_IRUGO | S_IWUSR, ft5x0x_fwupgradeapp_show,
-		   ft5x0x_fwupgradeapp_store);
+static DEVICE_ATTR(ftsfwupgradeapp, S_IRUGO|S_IWUSR, ft5x0x_fwupgradeapp_show, ft5x0x_fwupgradeapp_store);
 #endif
 
 #if CTP_PROC_INTERFACE
@@ -1768,6 +1780,7 @@ static int ft5x0x_GetInISize(char *config_name)
 }
 
 static int ft5x0x_ReadInIData(char *config_name, char *config_buf)
+
 {
 	struct file *pfile = NULL;
 	struct inode *inode;
@@ -1797,6 +1810,7 @@ static int ft5x0x_ReadInIData(char *config_name, char *config_buf)
 }
 
 static int ft5x0x_get_testparam_from_ini(char *config_name)
+
 {
 	char *filedata = NULL;
 	int inisize = ft5x0x_GetInISize(config_name);
@@ -1818,21 +1832,20 @@ static int ft5x0x_get_testparam_from_ini(char *config_name)
 }
 
 #if CTP_SYS_APK_UPDATE
-static ssize_t ft5x0x_ftsmcaptest_show(struct device *dev,
-				       struct device_attribute *attr, char *buf)
+static ssize_t ft5x0x_ftsmcaptest_show(struct device *dev, struct device_attribute *attr, char *buf)
+
 {
 	/* place holder for future use */
 	return -EPERM;
 }
 
-static ssize_t ft5x0x_ftsmcaptest_store(struct device *dev,
-					struct device_attribute *attr,
-					const char *buf, size_t count)
+static ssize_t ft5x0x_ftsmcaptest_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
+
 {
 	char cfgname[128];
 	memset(cfgname, 0, sizeof(cfgname));
 	sprintf(cfgname, "%s", buf);
-	cfgname[count - 1] = '\0';
+	cfgname[count-1] = '\0';
 	Init_I2C_Write_Func(focal_i2c_Write);
 	Init_I2C_Read_Func(focal_i2c_Read);
 	if (ft5x0x_get_testparam_from_ini(cfgname) < 0)
@@ -1847,15 +1860,14 @@ static ssize_t ft5x0x_ftsmcaptest_store(struct device *dev,
 	return count;
 }
 
-static DEVICE_ATTR(ftsmcaptest, S_IRUGO | S_IWUSR, ft5x0x_ftsmcaptest_show,
-		   ft5x0x_ftsmcaptest_store);
+static DEVICE_ATTR(ftsmcaptest, S_IRUGO|S_IWUSR, ft5x0x_ftsmcaptest_show, ft5x0x_ftsmcaptest_store);
 #endif
 
 #endif
 
 #ifdef CONFIG_OF
 static int ft5x06_get_dt_coords(struct device *dev, char *name,
-				struct ft5x06_ts_platform_data *pdata)
+								struct ft5x06_ts_platform_data *pdata)
 {
 	u32 coords[FT_COORDS_ARR_SIZE];
 	struct property *prop;
@@ -1899,7 +1911,7 @@ static int ft5x06_get_dt_coords(struct device *dev, char *name,
 }
 
 static int ft5x06_parse_dt(struct device *dev,
-			   struct ft5x06_ts_platform_data *pdata)
+						 struct ft5x06_ts_platform_data *pdata)
 {
 	int rc;
 	struct device_node *np = dev->of_node;
@@ -1922,19 +1934,20 @@ static int ft5x06_parse_dt(struct device *dev,
 	if (rc)
 		return rc;
 
-	pdata->i2c_pull_up = of_property_read_bool(np, "ftech,i2c-pull-up");
+
+	pdata->i2c_pull_up = of_property_read_bool(np,
+						"ftech,i2c-pull-up");
 
 	pdata->no_force_update = of_property_read_bool(np,
-						       "ftech,no-force-update");
+							"ftech,no-force-update");
 	/* reset, irq gpio info */
 	pdata->reset_gpio = of_get_named_gpio_flags(np, "ftech,reset-gpio",
-						    0,
-						    &pdata->reset_gpio_flags);
+						0, &pdata->reset_gpio_flags);
 	if (pdata->reset_gpio < 0)
 		return pdata->reset_gpio;
 
 	pdata->irq_gpio = of_get_named_gpio_flags(np, "ftech,irq-gpio",
-						  0, &pdata->irq_gpio_flags);
+					0, &pdata->irq_gpio_flags);
 	if (pdata->irq_gpio < 0)
 		return pdata->irq_gpio;
 
@@ -1951,13 +1964,15 @@ static int ft5x06_parse_dt(struct device *dev,
 	else
 		return rc;
 
-	rc = of_property_read_u32(np, "ftech,hard-reset-delay-ms", &temp_val);
+	rc = of_property_read_u32(np, "ftech,hard-reset-delay-ms",
+							&temp_val);
 	if (!rc)
 		pdata->hard_rst_dly = temp_val;
 	else
 		return rc;
 
-	rc = of_property_read_u32(np, "ftech,soft-reset-delay-ms", &temp_val);
+	rc = of_property_read_u32(np, "ftech,soft-reset-delay-ms",
+							&temp_val);
 	if (!rc)
 		pdata->soft_rst_dly = temp_val;
 	else
@@ -1974,50 +1989,53 @@ static int ft5x06_parse_dt(struct device *dev,
 		dev_err(dev, "Unable to read fw delay aa\n");
 		return rc;
 	} else if (rc != -EINVAL)
-		pdata->info.delay_aa = temp_val;
+		pdata->info.delay_aa =  temp_val;
 
 	rc = of_property_read_u32(np, "ftech,fw-delay-55-ms", &temp_val);
 	if (rc && (rc != -EINVAL)) {
 		dev_err(dev, "Unable to read fw delay 55\n");
 		return rc;
 	} else if (rc != -EINVAL)
-		pdata->info.delay_55 = temp_val;
+		pdata->info.delay_55 =  temp_val;
 
 	rc = of_property_read_u32(np, "ftech,fw-upgrade-id1", &temp_val);
 	if (rc && (rc != -EINVAL)) {
 		dev_err(dev, "Unable to read fw upgrade id1\n");
 		return rc;
 	} else if (rc != -EINVAL)
-		pdata->info.upgrade_id_1 = temp_val;
+		pdata->info.upgrade_id_1 =  temp_val;
 
 	rc = of_property_read_u32(np, "ftech,fw-upgrade-id2", &temp_val);
 	if (rc && (rc != -EINVAL)) {
 		dev_err(dev, "Unable to read fw upgrade id2\n");
 		return rc;
 	} else if (rc != -EINVAL)
-		pdata->info.upgrade_id_2 = temp_val;
+		pdata->info.upgrade_id_2 =  temp_val;
 
-	rc = of_property_read_u32(np, "ftech,fw-delay-readid-ms", &temp_val);
+	rc = of_property_read_u32(np, "ftech,fw-delay-readid-ms",
+							&temp_val);
 	if (rc && (rc != -EINVAL)) {
 		dev_err(dev, "Unable to read fw delay read id\n");
 		return rc;
 	} else if (rc != -EINVAL)
-		pdata->info.delay_readid = temp_val;
+		pdata->info.delay_readid =  temp_val;
 
-	rc = of_property_read_u32(np, "ftech,fw-delay-era-flsh-ms", &temp_val);
+	rc = of_property_read_u32(np, "ftech,fw-delay-era-flsh-ms",
+							&temp_val);
 	if (rc && (rc != -EINVAL)) {
 		dev_err(dev, "Unable to read fw delay erase flash\n");
 		return rc;
 	} else if (rc != -EINVAL)
-		pdata->info.delay_erase_flash = temp_val;
+		pdata->info.delay_erase_flash =  temp_val;
 
-	pdata->info.auto_cal = of_property_read_bool(np, "ftech,fw-auto-cal");
+	pdata->info.auto_cal = of_property_read_bool(np,
+						 "ftech,fw-auto-cal");
 
 	pdata->fw_vkey_support = of_property_read_bool(np,
-						       "ftech,fw-vkey-support");
+							"ftech,fw-vkey-support");
 
 	pdata->ignore_id_check = of_property_read_bool(np,
-						       "ftech,ignore-id-check");
+							"ftech,ignore-id-check");
 
 	rc = of_property_read_u32(np, "ftech,family-id", &temp_val);
 	if (!rc)
@@ -2032,8 +2050,8 @@ static int ft5x06_parse_dt(struct device *dev,
 			return -EINVAL;
 
 		rc = of_property_read_u32_array(np,
-						"ftech,button-map", button_map,
-						num_buttons);
+									  "ftech,button-map", button_map,
+									  num_buttons);
 		if (rc) {
 			dev_err(dev, "Unable to read key codes\n");
 			return rc;
@@ -2044,15 +2062,14 @@ static int ft5x06_parse_dt(struct device *dev,
 }
 #else
 static int ft5x06_parse_dt(struct device *dev,
-			   struct ft5x06_ts_platform_data *pdata)
+						 struct ft5x06_ts_platform_data *pdata)
 {
 	return -ENODEV;
 }
 #endif
 
 #if CTP_PROC_INTERFACE
-static ssize_t ctp_lockdown_proc_read(struct file *file, char __user *buf,
-				      size_t count, loff_t *ppos)
+static ssize_t ctp_lockdown_proc_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 {
 	char *ptr = buf;
 
@@ -2062,26 +2079,41 @@ static ssize_t ctp_lockdown_proc_read(struct file *file, char __user *buf,
 	}
 	*ppos += count;
 
-	return sprintf(ptr, "%02X%02X%02X%02X%02X%02X%02X%02X\n",
-		       lockdown_info[0], lockdown_info[1], lockdown_info[2],
-		       lockdown_info[3], lockdown_info[4], lockdown_info[5],
-		       lockdown_info[6], lockdown_info[7]);
+	return  sprintf(ptr, "%02X%02X%02X%02X%02X%02X%02X%02X\n",
+				 lockdown_info[0], lockdown_info[1], lockdown_info[2], lockdown_info[3],
+				 lockdown_info[4], lockdown_info[5], lockdown_info[6], lockdown_info[7]);
 
 }
 
-static ssize_t ctp_lockdown_proc_write(struct file *filp,
-				       const char __user *userbuf,
-				       size_t count, loff_t *ppos)
+static ssize_t ctp_lockdown_proc_write(struct file *filp, const char __user *userbuf, size_t count, loff_t *ppos)
 {
 	return -EPERM;
 }
 
-static ssize_t ctp_open_proc_read(struct file *file, char __user *buf,
-				  size_t count, loff_t *ppos)
+static ssize_t ctp_color_proc_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
+{
+	char *ptr = buf;
+
+	if (*ppos) {
+		CTP_INFO("tp test again return\n");
+		return 0;
+	}
+	*ppos += count;
+
+	return  sprintf(ptr, "%02X\n", lockdown_info[2]);
+
+}
+
+static ssize_t ctp_color_proc_write(struct file *filp, const char __user *userbuf, size_t count, loff_t *ppos)
+{
+	return -EPERM;
+}
+
+static ssize_t ctp_open_proc_read(struct file *file, char __user *buf, size_t count, loff_t *ppos)
 {
 	char *ptr = buf;
 	char cfgname[128];
-	u8 fw_info[6] = { 0x00 };
+	u8 fw_info[6] = {0x00};
 	u8 reg_addr = 0xA3;
 	u8 result = 0;
 
@@ -2093,6 +2125,7 @@ static ssize_t ctp_open_proc_read(struct file *file, char __user *buf,
 
 	ft5x06_i2c_read(update_client, &reg_addr, 1, fw_info, 6);
 	CTP_INFO("ic is %x", fw_info[5]);
+
 	if (fw_info[5] == VENDOR_BIEL_1080P) {
 		sprintf(cfgname, "%s", "ft5336_biel_1080p.ini");
 		CTP_INFO(" *** cfgname is: %s *** \n", cfgname);
@@ -2125,18 +2158,17 @@ static ssize_t ctp_open_proc_read(struct file *file, char __user *buf,
 		if (true == StartTestTP()) {
 			CTP_INFO("tp test pass\n");
 			result = 1;
+
 		} else {
 			CTP_INFO("tp test failure\n");
 			result = 0;
+
 		}
 		FreeTestParamData();
 	}
-	return sprintf(ptr, "result=%d\n", result);
+	return  sprintf(ptr, "result=%d\n", result);
 }
-
-static ssize_t ctp_open_proc_write(struct file *filp,
-				   const char __user *userbuf, size_t count,
-				   loff_t *ppos)
+static ssize_t ctp_open_proc_write(struct file *filp, const char __user *userbuf, size_t count, loff_t *ppos)
 {
 	return -EPERM;
 }
@@ -2146,6 +2178,7 @@ static void create_ctp_proc(void)
 	struct proc_dir_entry *ctp_device_proc = NULL;
 	struct proc_dir_entry *ctp_open_proc = NULL;
 	struct proc_dir_entry *ctp_lockdown_proc = NULL;
+	struct proc_dir_entry *ctp_color_proc = NULL;
 
 	ctp_device_proc = proc_mkdir(CTP_PARENT_PROC_NAME, NULL);
 	if (ctp_device_proc == NULL) {
@@ -2153,18 +2186,20 @@ static void create_ctp_proc(void)
 		return;
 	}
 
-	ctp_open_proc =
-	    proc_create(CTP_OPEN_PROC_NAME, 0777, ctp_device_proc,
-			&ctp_open_procs_fops);
+	ctp_open_proc = proc_create(CTP_OPEN_PROC_NAME, 0777, ctp_device_proc, &ctp_open_procs_fops);
 	if (ctp_open_proc == NULL) {
 		CTP_ERROR("ft5x06: create open_proc fail\n");
 	}
 
-	ctp_lockdown_proc =
-	    proc_create(CTP_LOCKDOWN_INFOR_NAME, 0666, ctp_device_proc,
-			&ctp_lockdown_procs_fops);
+	ctp_lockdown_proc = proc_create(CTP_LOCKDOWN_INFOR_NAME, 0666, ctp_device_proc, &ctp_lockdown_procs_fops);
 	if (ctp_lockdown_proc == NULL) {
 		CTP_ERROR("ft5x06: create ctp_lockdown_proc fail\n");
+	}
+
+
+	ctp_color_proc = proc_create(CTP_COLOR_INFOR_NAME, 0666, ctp_device_proc, &ctp_color_procs_fops);
+	if (ctp_color_proc == NULL) {
+		CTP_ERROR("ft5x06: create ctp_color_proc fail\n");
 	}
 
 }
@@ -2172,24 +2207,24 @@ static void create_ctp_proc(void)
 
 #if FTS_PROC_APK_DEBUG
 static int ft5x0x_i2c_Read(struct i2c_client *client, char *writebuf,
-			   int writelen, char *readbuf, int readlen)
+		  int writelen, char *readbuf, int readlen)
 {
 	int ret;
 
 	if (writelen > 0) {
 		struct i2c_msg msgs[] = {
 			{
-			 .addr = client->addr,
-			 .flags = 0,
-			 .len = writelen,
-			 .buf = writebuf,
-			 },
+			.addr = client->addr,
+			.flags = 0,
+			.len = writelen,
+			.buf = writebuf,
+			},
 			{
-			 .addr = client->addr,
-			 .flags = I2C_M_RD,
-			 .len = readlen,
-			 .buf = readbuf,
-			 },
+			.addr = client->addr,
+			.flags = I2C_M_RD,
+			.len = readlen,
+			.buf = readbuf,
+			},
 		};
 		ret = i2c_transfer(client->adapter, msgs, 2);
 		if (ret < 0)
@@ -2198,11 +2233,11 @@ static int ft5x0x_i2c_Read(struct i2c_client *client, char *writebuf,
 	} else {
 		struct i2c_msg msgs[] = {
 			{
-			 .addr = client->addr,
-			 .flags = I2C_M_RD,
-			 .len = readlen,
-			 .buf = readbuf,
-			 },
+			.addr = client->addr,
+			.flags = I2C_M_RD,
+			.len = readlen,
+			.buf = readbuf,
+			},
 		};
 		ret = i2c_transfer(client->adapter, msgs, 1);
 		if (ret < 0)
@@ -2210,20 +2245,18 @@ static int ft5x0x_i2c_Read(struct i2c_client *client, char *writebuf,
 	}
 	return ret;
 }
-
 /*write data by i2c*/
-static int ft5x0x_i2c_Write(struct i2c_client *client, char *writebuf,
-			    int writelen)
+static int ft5x0x_i2c_Write(struct i2c_client *client, char *writebuf, int writelen)
 {
 	int ret;
 
 	struct i2c_msg msg[] = {
 		{
-		 .addr = client->addr,
-		 .flags = 0,
-		 .len = writelen,
-		 .buf = writebuf,
-		 },
+		.addr = client->addr,
+		.flags = 0,
+		.len = writelen,
+		.buf = writebuf,
+		},
 	};
 
 	ret = i2c_transfer(client->adapter, msg, 1);
@@ -2233,8 +2266,7 @@ static int ft5x0x_i2c_Write(struct i2c_client *client, char *writebuf,
 	return ret;
 }
 
-static ssize_t ft5x0x_debug_write(struct file *filp, const char __user *buff,
-				  size_t len, loff_t *ppos)
+static ssize_t ft5x0x_debug_write(struct file *filp, const char __user *buff, size_t len, loff_t *ppos)
 {
 	struct i2c_client *client = update_client;
 	unsigned char writebuf[FTS_PACKET_LENGTH];
@@ -2257,18 +2289,15 @@ static ssize_t ft5x0x_debug_write(struct file *filp, const char __user *buff,
 			char upgrade_file_path[128];
 			memset(upgrade_file_path, 0, sizeof(upgrade_file_path));
 			sprintf(upgrade_file_path, "%s", writebuf + 1);
-			upgrade_file_path[buflen - 1] = '\0';
+			upgrade_file_path[buflen-1] = '\0';
 
 			disable_irq(client->irq);
 
-			ret =
-			    fts_ctpm_fw_upgrade_with_app_file
-			    (upgrade_file_path);
+			ret = fts_ctpm_fw_upgrade_with_app_file(upgrade_file_path);
 
 			enable_irq(client->irq);
 			if (ret < 0) {
-				dev_err(&client->dev, "%s:upgrade failed.\n",
-					__func__);
+				dev_err(&client->dev, "%s:upgrade failed.\n", __func__);
 				return ret;
 			}
 		}
@@ -2305,8 +2334,7 @@ static ssize_t ft5x0x_debug_write(struct file *filp, const char __user *buff,
 static unsigned char debug_read_buf[PAGE_SIZE];
 
 /*interface of read proc*/
-static ssize_t ft5x0x_debug_read(struct file *file, char __user *user_buf,
-				 size_t count, loff_t *ppos)
+static ssize_t ft5x0x_debug_read(struct file *file, char __user *user_buf, size_t count, loff_t *ppos)
 {
 	struct i2c_client *client = update_client;
 	int ret = 0;
@@ -2319,17 +2347,13 @@ static ssize_t ft5x0x_debug_read(struct file *file, char __user *user_buf,
 
 	switch (proc_operate_mode) {
 	case PROC_UPGRADE:
-		/*after calling ft5x0x_debug_write to upgrade */
+		/*after calling ft5x0x_debug_write to upgrade*/
 		regaddr = 0xA6;
 		ret = ft5x0x_read_reg(client, regaddr, &regvalue);
 		if (ret < 0)
-			num_read_chars =
-			    sprintf(debug_read_buf, "%s",
-				    "get fw version failed.\n");
+			num_read_chars = sprintf(debug_read_buf, "%s", "get fw version failed.\n");
 		else
-			num_read_chars =
-			    sprintf(debug_read_buf,
-				    "current fw version:0x%02x\n", regvalue);
+			num_read_chars = sprintf(debug_read_buf, "current fw version:0x%02x\n", regvalue);
 		break;
 	case PROC_READ_REGISTER:
 		readlen = 1;
@@ -2338,7 +2362,8 @@ static ssize_t ft5x0x_debug_read(struct file *file, char __user *user_buf,
 			dev_err(&client->dev, "%s:read iic error\n", __func__);
 			return ret;
 		} else
-			num_read_chars = 1;
+
+		num_read_chars = 1;
 		break;
 	case PROC_RAWDATA:
 		break;
@@ -2360,8 +2385,7 @@ static const struct file_operations ctp_apk_proc_fops = {
 
 static int ft5x0x_create_apk_debug_channel(struct i2c_client *client)
 {
-	ft5x0x_proc_entry =
-	    proc_create(PROC_NAME, 0666, NULL, &ctp_apk_proc_fops);
+	ft5x0x_proc_entry = proc_create(PROC_NAME, 0666, NULL, &ctp_apk_proc_fops);
 	if (NULL == ft5x0x_proc_entry) {
 		dev_err(&client->dev, "Couldn't create proc entry!\n");
 		return -ENOMEM;
@@ -2382,7 +2406,7 @@ int get_boot_mode(struct i2c_client *client)
 	int ret;
 	char *cmdline_tp = NULL;
 	char *temp;
-	char cmd_line[15] = { '\0' };
+	char cmd_line[15] = {'\0'};
 
 	cmdline_tp = strstr(saved_command_line, "androidboot.mode=");
 	if (cmdline_tp != NULL) {
@@ -2392,19 +2416,19 @@ int get_boot_mode(struct i2c_client *client)
 		dev_err(&client->dev, "cmd_line =%s \n", cmd_line);
 		if (ret == 0) {
 			dev_err(&client->dev, "mode: ffbm\n");
-			return 1;	/* factory mode */
+			return 1;/* factory mode*/
 		} else {
 			dev_err(&client->dev, "mode: no ffbm\n");
-			return 2;	/* no factory mode */
+			return 2;/* no factory mode*/
 		}
 	}
+
 	dev_err(&client->dev, "has no androidboot.mode \n");
 	return 0;
 }
 
 static int ft5x06_ts_probe(struct i2c_client *client,
-			   const struct i2c_device_id *id)
-{
+						 const struct i2c_device_id *id) {
 	struct ft5x06_ts_platform_data *pdata;
 	struct ft5x06_ts_data *data;
 	struct input_dev *input_dev;
@@ -2428,8 +2452,7 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 
 	if (client->dev.of_node) {
 		pdata = devm_kzalloc(&client->dev,
-			sizeof(struct ft5x06_ts_platform_data),
-			GFP_KERNEL);
+							sizeof(struct ft5x06_ts_platform_data), GFP_KERNEL);
 		if (!pdata) {
 			dev_err(&client->dev, "Failed to allocate memory\n");
 			return -ENOMEM;
@@ -2454,7 +2477,7 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 	}
 
 	data = devm_kzalloc(&client->dev,
-			    sizeof(struct ft5x06_ts_data), GFP_KERNEL);
+						sizeof(struct ft5x06_ts_data), GFP_KERNEL);
 	if (!data) {
 		dev_err(&client->dev, "Not enough memory\n");
 		return -ENOMEM;
@@ -2472,7 +2495,7 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 
 	data->tch_data_len = FT_TCH_LEN(pdata->num_max_touches);
 	data->tch_data = devm_kzalloc(&client->dev,
-			data->tch_data_len, GFP_KERNEL);
+								data->tch_data_len, GFP_KERNEL);
 	if (!data) {
 		return -ENOMEM;
 	}
@@ -2500,9 +2523,9 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 
 	input_mt_init_slots(input_dev, pdata->num_max_touches, 0);
 	input_set_abs_params(input_dev, ABS_MT_POSITION_X, pdata->x_min,
-			     pdata->x_max, 0, 0);
+						pdata->x_max, 0, 0);
 	input_set_abs_params(input_dev, ABS_MT_POSITION_Y, pdata->y_min,
-			     pdata->y_max, 0, 0);
+						pdata->y_max, 0, 0);
 
 	err = input_register_device(input_dev);
 	if (err) {
@@ -2546,7 +2569,7 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 		err = gpio_direction_input(pdata->irq_gpio);
 		if (err) {
 			dev_err(&client->dev,
-				"set_direction for irq gpio failed\n");
+					"set_direction for irq gpio failed\n");
 			goto free_irq_gpio;
 		}
 	}
@@ -2560,7 +2583,7 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 		err = gpio_direction_output(pdata->reset_gpio, 0);
 		if (err) {
 			dev_err(&client->dev,
-				"set_direction for reset gpio failed\n");
+					"set_direction for reset gpio failed\n");
 			goto free_reset_gpio;
 		}
 		msleep(data->pdata->hard_rst_dly);
@@ -2575,7 +2598,14 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 	err = ft5x06_i2c_read(client, &reg_addr, 1, &reg_value, 1);
 	if (err < 0) {
 		dev_err(&client->dev, "version read failed");
-		goto free_reset_gpio;
+
+		client->addr = 0x3E;
+		err = ft5x06_i2c_read(client, &reg_addr, 1, &reg_value, 1);
+		if (err < 0) {
+				dev_err(&client->dev, "version read failed addr -----3E");
+				goto free_reset_gpio;
+
+		}
 	}
 	ic_name = reg_value;
 
@@ -2589,9 +2619,9 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 	data->family_id = pdata->family_id;
 
 	err = request_threaded_irq(client->irq, NULL,
-				   ft5x06_ts_interrupt,
-				   pdata->irq_gpio_flags | IRQF_ONESHOT,
-				   client->dev.driver->name, data);
+							 ft5x06_ts_interrupt,
+							 IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
+							 client->dev.driver->name, data);
 	if (err) {
 		dev_err(&client->dev, "request irq failed\n");
 		goto free_reset_gpio;
@@ -2629,45 +2659,38 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 		pr_err("debugfs_create_dir failed(%ld)\n", PTR_ERR(data->dir));
 		err = PTR_ERR(data->dir);
 	} else {
-		temp =
-		    debugfs_create_file("addr", S_IRUSR | S_IWUSR, data->dir,
-					data, &debug_addr_fops);
+		temp = debugfs_create_file("addr", S_IRUSR | S_IWUSR, data->dir, data,
+					 &debug_addr_fops);
 		if (temp == NULL || IS_ERR(temp)) {
-			pr_err("debugfs_create_file failed: rc=%ld\n",
-			       PTR_ERR(temp));
+			pr_err("debugfs_create_file failed: rc=%ld\n", PTR_ERR(temp));
 			err = PTR_ERR(temp);
 		}
 
-		temp =
-		    debugfs_create_file("data", S_IRUSR | S_IWUSR, data->dir,
-					data, &debug_data_fops);
+		temp = debugfs_create_file("data", S_IRUSR | S_IWUSR, data->dir, data,
+					 &debug_data_fops);
 		if (temp == NULL || IS_ERR(temp)) {
-			pr_err("debugfs_create_file failed: rc=%ld\n",
-			       PTR_ERR(temp));
+			pr_err("debugfs_create_file failed: rc=%ld\n", PTR_ERR(temp));
 			err = PTR_ERR(temp);
 		}
 
-		temp =
-		    debugfs_create_file("suspend", S_IRUSR | S_IWUSR, data->dir,
-					data, &debug_suspend_fops);
+		temp = debugfs_create_file("suspend", S_IRUSR | S_IWUSR, data->dir,
+						data, &debug_suspend_fops);
 		if (temp == NULL || IS_ERR(temp)) {
-			pr_err("debugfs_create_file failed: rc=%ld\n",
-			       PTR_ERR(temp));
+			pr_err("debugfs_create_file failed: rc=%ld\n", PTR_ERR(temp));
 			err = PTR_ERR(temp);
 		}
 
-		temp =
-		    debugfs_create_file("dump_info", S_IRUSR | S_IWUSR,
-					data->dir, data, &debug_dump_info_fops);
+		temp = debugfs_create_file("dump_info", S_IRUSR | S_IWUSR, data->dir,
+						data, &debug_dump_info_fops);
 		if (temp == NULL || IS_ERR(temp)) {
-			pr_err("debugfs_create_file failed: rc=%ld\n",
-			       PTR_ERR(temp));
+			pr_err("debugfs_create_file failed: rc=%ld\n", PTR_ERR(temp));
 			err = PTR_ERR(temp);
 		}
 	}
 #endif
 
-	data->ts_info = devm_kzalloc(&client->dev, FT_INFO_MAX_LEN, GFP_KERNEL);
+	data->ts_info = devm_kzalloc(&client->dev,
+								FT_INFO_MAX_LEN, GFP_KERNEL);
 	if (!data->ts_info) {
 		dev_err(&client->dev, "Not enough memory\n");
 		goto free_irq_gpio;
@@ -2692,10 +2715,10 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 	ft5x06_update_fw_vendor_id(data);
 
 	FT_STORE_TS_INFO(data->ts_info, data->family_id, data->pdata->name,
-			 data->pdata->num_max_touches, data->pdata->group_id,
-			 data->pdata->fw_vkey_support ? "yes" : "no",
-			 data->pdata->fw_name, data->fw_ver[0],
-			 data->fw_ver[1], data->fw_ver[2]);
+					data->pdata->num_max_touches, data->pdata->group_id,
+					data->pdata->fw_vkey_support ? "yes" : "no",
+					data->pdata->fw_name, data->fw_ver[0],
+					data->fw_ver[1], data->fw_ver[2]);
 
 #if CTP_LOCKDOWN_INFO
 	fts_ctpm_read_lockdown(client, data);
@@ -2709,10 +2732,10 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 
 	if (err)
 		dev_err(&client->dev, "Unable to register fb_notifier: %d\n",
-			err);
+				err);
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 	data->early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN +
-	    FT_SUSPEND_LEVEL;
+								FT_SUSPEND_LEVEL;
 	data->early_suspend.suspend = ft5x06_ts_early_suspend;
 	data->early_suspend.resume = ft5x06_ts_late_resume;
 	register_early_suspend(&data->early_suspend);
@@ -2726,21 +2749,20 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 	ft5x0x_create_apk_debug_channel(update_client);
 #endif
 
+
 #if TPD_AUTO_UPGRADE
+
 	err = get_boot_mode(client);
 	if (err == 0) {
 		dev_err(&client->dev, "upgrade\n");
-		CTP_DEBUG
-		    ("********************Enter CTP Auto Upgrade********************\n");
+		CTP_DEBUG("********************Enter CTP Auto Upgrade********************\n");
 		msleep(50);
 		i = 0;
 		do {
-			ret_auto_upgrade =
-			    fts_ctpm_fw_upgrade_with_i_file(data);
+			ret_auto_upgrade = fts_ctpm_fw_upgrade_with_i_file(data);
 			i++;
 			if (ret_auto_upgrade < 0) {
-				CTP_DEBUG(" ctp upgrade fail err = %d \n",
-					  ret_auto_upgrade);
+				CTP_DEBUG(" ctp upgrade fail err = %d \n", ret_auto_upgrade);
 			}
 		} while ((ret_auto_upgrade < 0) && (i < 3));
 	} else {
@@ -2757,6 +2779,7 @@ static int ft5x06_ts_probe(struct i2c_client *client,
 	enable_irq(data->client->irq);
 
 	return 0;
+
 
 free_reset_gpio:
 	if (gpio_is_valid(pdata->reset_gpio))
@@ -2797,10 +2820,10 @@ static int ft5x06_ts_remove(struct i2c_client *client)
 	ft5x0x_release_apk_debug_channel();
 #endif
 
+
 #if defined(CONFIG_FB)
 	if (fb_unregister_client(&data->fb_notif))
-		dev_err(&client->dev,
-			"Error occurred while unregistering fb_notifier.\n");
+		dev_err(&client->dev, "Error occurred while unregistering fb_notifier.\n");
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 	unregister_early_suspend(&data->early_suspend);
 #endif
@@ -2822,6 +2845,33 @@ static int ft5x06_ts_remove(struct i2c_client *client)
 	return 0;
 }
 
+
+void ft5x06_ts_shutdown(struct i2c_client *client)
+{
+	struct ft5x06_ts_data *data = i2c_get_clientdata(client);
+	int retval;
+
+	free_irq(client->irq, data);
+
+	if (gpio_is_valid(data->pdata->reset_gpio)) {
+		retval = gpio_direction_output(data->pdata->reset_gpio, 0);
+		if (retval) {
+			dev_err(&data->client->dev,
+			"set_direction for reset gpio failed\n");
+		}
+		gpio_free(data->pdata->reset_gpio);
+	}
+
+	if (gpio_is_valid(data->pdata->irq_gpio))
+		gpio_free(data->pdata->irq_gpio);
+
+	if (data->pdata->power_init)
+		data->pdata->power_init(false);
+	else
+		ft5x06_power_init(data, false);
+}
+
+
 static const struct i2c_device_id ft5x06_ts_id[] = {
 	{"ft5x06_720p", 0},
 	{},
@@ -2831,8 +2881,8 @@ MODULE_DEVICE_TABLE(i2c, ft5x06_ts_id);
 
 #ifdef CONFIG_OF
 static struct of_device_id ft5x06_match_table[] = {
-	{.compatible = "focaltech,5336",},
-	{},
+	{ .compatible = "focaltech,5336",},
+	{ },
 };
 #else
 #define ft5x06_match_table NULL
@@ -2841,14 +2891,15 @@ static struct of_device_id ft5x06_match_table[] = {
 static struct i2c_driver ft5x06_ts_driver = {
 	.probe = ft5x06_ts_probe,
 	.remove = ft5x06_ts_remove,
+	.shutdown = ft5x06_ts_shutdown,
 	.driver = {
-		   .name = "ft5x06_720p",
-		   .owner = THIS_MODULE,
-		   .of_match_table = ft5x06_match_table,
+		.name = "ft5x06_720p",
+		.owner = THIS_MODULE,
+		.of_match_table = ft5x06_match_table,
 #ifdef CONFIG_PM
-		   .pm = &ft5x06_ts_pm_ops,
+		.pm = &ft5x06_ts_pm_ops,
 #endif
-		   },
+	},
 	.id_table = ft5x06_ts_id,
 };
 
@@ -2856,14 +2907,12 @@ static int __init ft5x06_ts_init(void)
 {
 	return i2c_add_driver(&ft5x06_ts_driver);
 }
-
 module_init(ft5x06_ts_init);
 
 static void __exit ft5x06_ts_exit(void)
 {
 	i2c_del_driver(&ft5x06_ts_driver);
 }
-
 module_exit(ft5x06_ts_exit);
 
 MODULE_DESCRIPTION("FocalTech ft5x06 TouchScreen driver");
