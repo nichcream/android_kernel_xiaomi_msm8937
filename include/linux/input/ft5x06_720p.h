@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2010  Focal tech Ltd.
  * Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
- * Copyright (C) 2016 XiaoMi, Inc.
+ * Copyright (C) 2018 XiaoMi, Inc.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -44,6 +44,7 @@
 #define FT_TOUCH_CONTACT    2
 #define FT_LOCKDOWN_SIZE	8
 
+
 /*register address*/
 #define FT_REG_DEV_MODE     0x00
 #define FT_DEV_MODE_REG_CAL 0x02
@@ -68,8 +69,10 @@
 #define VENDOR_OUFEI_720P    0xF3
 #define VENDOR_LENS_720P    0xF4
 
+
 #define VENDOR_WINTEK		0x89
 #define VENDOR_GIS		        0x8F
+
 
 /*IC name*/
 #define IC_FT5X06               0x55
@@ -139,6 +142,7 @@
 
 #define FT5x0x_REG_FW_VER   0xA6
 
+
 /* Firmware file is not supporting minor and sub minor so use 0 */
 #define FT_FW_FILE_MAJ_VER(x)   ((x)->data[(x)->size - 2])
 #define FT_FW_FILE_MIN_VER(x)   0
@@ -155,12 +159,12 @@
 * make sure the application data is valid.
 */
 #define FT_FW_CHECK(x, ts_data) \
-    (ts_data->family_id == FT6X36_ID ? \
-    (((x)->data[0x104] ^ (x)->data[0x105]) == 0xFF \
-    && ((x)->data[0x106] ^ (x)->data[0x107]) == 0xFF) : \
-    (((x)->data[(x)->size - 8] ^ (x)->data[(x)->size - 6]) == 0xFF \
-    && ((x)->data[(x)->size - 7] ^ (x)->data[(x)->size - 5]) == 0xFF \
-    && ((x)->data[(x)->size - 3] ^ (x)->data[(x)->size - 4]) == 0xFF))
+	(ts_data->family_id == FT6X36_ID ? \
+	(((x)->data[0x104] ^ (x)->data[0x105]) == 0xFF \
+	&& ((x)->data[0x106] ^ (x)->data[0x107]) == 0xFF) : \
+	(((x)->data[(x)->size - 8] ^ (x)->data[(x)->size - 6]) == 0xFF \
+	&& ((x)->data[(x)->size - 7] ^ (x)->data[(x)->size - 5]) == 0xFF \
+	&& ((x)->data[(x)->size - 3] ^ (x)->data[(x)->size - 4]) == 0xFF))
 
 #define FT_MAX_TRIES        5
 #define FT_RETRY_DLY        20
@@ -184,6 +188,7 @@
 
 #define FT_INFO_MAX_LEN     512
 #define FTS_PACKET_LENGTH	128
+
 
 #define FT_BLOADER_SIZE_OFF 12
 #define FT_BLOADER_NEW_SIZE 30
@@ -224,13 +229,14 @@ struct Upgrade_Info {
 	u8 FTS_NAME[20];
 	u8 TPD_MAX_POINTS;
 	u8 AUTO_CLB;
-	u16 delay_aa;		/*delay of write FT_UPGRADE_AA */
-	u16 delay_55;		/*delay of write FT_UPGRADE_55 */
-	u8 upgrade_id_1;	/*upgrade id 1 */
-	u8 upgrade_id_2;	/*upgrade id 2 */
-	u16 delay_readid;	/*delay of read id */
-	u16 delay_earse_flash;	/*delay of earse flash */
+	u16 delay_aa;       /*delay of write FT_UPGRADE_AA */
+	u16 delay_55;       /*delay of write FT_UPGRADE_55 */
+	u8 upgrade_id_1;    /*upgrade id 1 */
+	u8 upgrade_id_2;    /*upgrade id 2 */
+	u16 delay_readid;   /*delay of read id */
+	u16 delay_earse_flash; /*delay of earse flash*/
 };
+
 
 struct ft5x06_ts_platform_data {
 	struct fw_upgrade_info info;
@@ -292,6 +298,7 @@ struct ft5x06_ts_data {
 };
 
 
+
 #define CTP_IC_TYPE_0 0x12
 #define CTP_IC_TYPE_1 0x14
 
@@ -305,6 +312,7 @@ struct ft5x06_ts_data {
 #define CTP_PROC_INTERFACE 1
 #define CTP_LOCKDOWN_INFO  1
 
+
 #define WT_ADD_CTP_INFO   1
 
 #define CTP_DEBUG_ON 1
@@ -314,12 +322,13 @@ struct ft5x06_ts_data {
 #define CTP_ERROR(fmt, arg...)          printk("FT5X06-TP-TAG ERROR:"fmt"\n", ##arg)
 
 #define CTP_DEBUG(fmt, arg...)          do {\
-		if (CTP_DEBUG_ON)\
-			printk("FT5X06-TP-TAG DEBUG:[%d]"fmt"\n", __LINE__, ##arg);\
-	} while (0)
+									     if (CTP_DEBUG_ON)\
+									     printk("FT5X06-TP-TAG DEBUG:[%d]"fmt"\n", __LINE__, ##arg);\
+									   } while (0)
 #define CTP_DEBUG_FUNC()               do {\
-		if (CTP_DEBUG_FUNC_ON)\
-			printk("FT5X06-TP-TAG Func:%s@Line:%d\n", __func__, __LINE__);\
-	} while (0)
+									     if (CTP_DEBUG_FUNC_ON)\
+									     printk("FT5X06-TP-TAG Func:%s@Line:%d\n", __func__, __LINE__);\
+									   } while (0)
+
 
 #endif
