@@ -36,7 +36,11 @@
 &pmi8950_charger {
 	qcom,battery-data = <&qrd_batterydata>;
 	qcom,float-voltage-mv = <4400>;
-	qcom,thermal-mitigation = <2000 1500 1200 800 800>;
+	qcom,fastchg-current-comp = <1200>;
+	qcom,float-voltage-comp = <16>; /* need change to 16 if float-voltage change to 4.4 */
+	qcom,thermal-mitigation = <3000 1200 600 0>;
+	qcom,iterm-ma = <200>;
+	qcom,override-usb-current;
 	status = "okay";
 };
 
