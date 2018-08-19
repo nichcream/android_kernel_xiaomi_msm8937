@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2017 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011-2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -871,7 +871,7 @@ limSendProbeRspMgmtFrame(tpAniSirGlobal pMac,
             return;
         }
         if (addnIE1Len <= WNI_CFG_PROBE_RSP_ADDNIE_DATA1_LEN && addnIE1Len &&
-                     (nBytes + addnIE1Len) <= SIR_MAX_PACKET_SIZE)
+                     (nBytes + addnIE1Len) <= SCH_MAX_PROBE_RESP_SIZE)
         {
             if ( eSIR_SUCCESS != wlan_cfgGetStr(pMac,
                                      WNI_CFG_PROBE_RSP_ADDNIE_DATA1, &addIE[0],
@@ -895,7 +895,7 @@ limSendProbeRspMgmtFrame(tpAniSirGlobal pMac,
             return;
         }
         if (addnIE2Len <= WNI_CFG_PROBE_RSP_ADDNIE_DATA2_LEN && addnIE2Len &&
-                     (nBytes + addnIE2Len) <= SIR_MAX_PACKET_SIZE)
+                     (nBytes + addnIE2Len) <= SCH_MAX_PROBE_RESP_SIZE)
         {
             if ( eSIR_SUCCESS != wlan_cfgGetStr(pMac,
                                      WNI_CFG_PROBE_RSP_ADDNIE_DATA2, &addIE[addnIE1Len],
@@ -919,7 +919,7 @@ limSendProbeRspMgmtFrame(tpAniSirGlobal pMac,
             return;
         }
         if (addnIE3Len <= WNI_CFG_PROBE_RSP_ADDNIE_DATA3_LEN && addnIE3Len &&
-                     (nBytes + addnIE3Len) <= SIR_MAX_PACKET_SIZE)
+                     (nBytes + addnIE3Len) <= SCH_MAX_PROBE_RESP_SIZE)
         {
             if ( eSIR_SUCCESS != wlan_cfgGetStr(pMac,
                                      WNI_CFG_PROBE_RSP_ADDNIE_DATA3,
@@ -5402,6 +5402,8 @@ lim_send_extended_chan_switch_action_frame(tpAniSirGlobal mac_ctx,
        (session_entry->pePersona == VOS_P2P_GO_MODE)) {
          txFlag |= HAL_USE_BD_RATE2_FOR_MANAGEMENT_FRAME;
    }
+   /* Use peer sta to transmit this frame */
+   txFlag |= HAL_USE_PEER_STA_REQUESTED_MASK;
 
    limLog(mac_ctx, LOG1, FL("Send Ext channel Switch to :"MAC_ADDRESS_STR" with swcount %d, swmode %d , newchannel %d newops %d"),
           MAC_ADDR_ARRAY(mac_hdr->da),

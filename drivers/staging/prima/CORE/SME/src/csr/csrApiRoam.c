@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -112,8 +112,6 @@
 static tANI_BOOLEAN bRoamScanOffloadStarted = VOS_FALSE;
 #endif
 
-#define MAX_PWR_FCC_CHAN_12 8
-#define MAX_PWR_FCC_CHAN_13 2
 
 /*-------------------------------------------------------------------------- 
   Static Type declarations
@@ -270,7 +268,9 @@ void csrRoamJoinRetryTimerHandler(void *pv);
 #endif
 void limInitOperatingClasses( tHalHandle hHal );
 extern void SysProcessMmhMsg(tpAniSirGlobal pMac, tSirMsgQ* pMsg);
+#ifdef WLAN_BTAMP_FEATURE
 extern void btampEstablishLogLinkHdlr(void* pMsg);
+#endif
 static void csrSerDesUnpackDiassocRsp(tANI_U8 *pBuf, tSirSmeDisassocRsp *pRsp);
 void csrReinitPreauthCmd(tpAniSirGlobal pMac, tSmeCmd *pCommand);
 
@@ -604,21 +604,6 @@ eHalStatus csrUpdateChannelList(tpAniSirGlobal pMac)
         pChanList->chanParam[num_channel].pwr =
           cfgGetRegulatoryMaxTransmitPower(pMac,
                                            pScan->defaultPowerTable[i].chanId);
-        if (pMac->scan.fcc_constraint)
-        {
-            if (pChanList->chanParam[num_channel].chanId == 12)
-            {
-                pChanList->chanParam[num_channel].pwr = MAX_PWR_FCC_CHAN_12;
-                smsLog(pMac, LOG1,
-                      "fcc_constraint is set, txpower for channel 12 is 8db ");
-            }
-            if (pChanList->chanParam[num_channel].chanId == 13)
-            {
-                pChanList->chanParam[num_channel].pwr = MAX_PWR_FCC_CHAN_13;
-                smsLog(pMac, LOG1,
-                      "fcc_constraint is set, txpower for channel 13 is 2db ");
-            }
-        }
 
         if (!pChanList->chanParam[num_channel].pwr)
         {
@@ -1287,6 +1272,9 @@ static void initConfigParam(tpAniSirGlobal pMac)
 
     pMac->roam.configParam.addTSWhenACMIsOff = 0;
     pMac->roam.configParam.fScanTwice = eANI_BOOLEAN_FALSE;
+    pMac->roam.configParam.agg_btc_sco_enabled = eANI_BOOLEAN_FALSE;
+    pMac->roam.configParam.num_ba_buff_btc_sco = DEFAULT_NUM_BUFF_BTC_SCO;
+    pMac->roam.configParam.num_ba_buff = WNI_CFG_NUM_BUFF_ADVERT_STADEF;
 
     //Remove this code once SLM_Sessionization is supported 
     //BMPS_WORKAROUND_NOT_NEEDED
@@ -1735,6 +1723,7 @@ v_U32_t csrConvertPhyCBStateToIniValue(ePhyChanBondState phyCbState)
 eHalStatus csrChangeDefaultConfigParam(tpAniSirGlobal pMac, tCsrConfigParam *pParam)
 {
     eHalStatus status = eHAL_STATUS_SUCCESS;
+    tANI_U8 i;
 
     if(pParam)
     {
@@ -2081,6 +2070,15 @@ eHalStatus csrChangeDefaultConfigParam(tpAniSirGlobal pMac, tCsrConfigParam *pPa
         pMac->roam.configParam.edca_vi_aifs = pParam->edca_vi_aifs;
         pMac->roam.configParam.edca_bk_aifs = pParam->edca_bk_aifs;
         pMac->roam.configParam.edca_be_aifs = pParam->edca_be_aifs;
+        pMac->sta_sap_scc_on_dfs_chan = pParam->sta_sap_scc_on_dfs_chan;
+        pMac->force_scc_with_ecsa = pParam->force_scc_with_ecsa;
+        for (i = 0; i < 3; i++) {
+             pMac->roam.configParam.agg_btc_sco_oui[i] =
+                                                     pParam->agg_btc_sco_oui[i];
+        }
+        pMac->roam.configParam.num_ba_buff_btc_sco =
+                                                    pParam->num_ba_buff_btc_sco;
+        pMac->roam.configParam.num_ba_buff = pParam->num_ba_buff;
     }
     
     return status;
@@ -2089,6 +2087,7 @@ eHalStatus csrChangeDefaultConfigParam(tpAniSirGlobal pMac, tCsrConfigParam *pPa
 eHalStatus csrGetConfigParam(tpAniSirGlobal pMac, tCsrConfigParam *pParam)
 {
     eHalStatus status = eHAL_STATUS_INVALID_PARAMETER;
+    tANI_U8 i;
     if(pParam)
     {
         pParam->WMMSupportMode = pMac->roam.configParam.WMMSupportMode;
@@ -2279,6 +2278,16 @@ eHalStatus csrGetConfigParam(tpAniSirGlobal pMac, tCsrConfigParam *pParam)
         pParam->edca_vi_aifs = pMac->roam.configParam.edca_vi_aifs;
         pParam->edca_bk_aifs = pMac->roam.configParam.edca_bk_aifs;
         pParam->edca_be_aifs = pMac->roam.configParam.edca_be_aifs;
+        pParam->sta_sap_scc_on_dfs_chan = pMac->sta_sap_scc_on_dfs_chan;
+        pParam->force_scc_with_ecsa = pMac->force_scc_with_ecsa;
+
+        for (i = 0; i < 3; i++) {
+             pParam->agg_btc_sco_oui[i] =
+                                      pMac->roam.configParam.agg_btc_sco_oui[i];
+        }
+        pParam->num_ba_buff_btc_sco =
+                                     pMac->roam.configParam.num_ba_buff_btc_sco;
+        pParam->num_ba_buff = pMac->roam.configParam.num_ba_buff;
 
         status = eHAL_STATUS_SUCCESS;
     }
@@ -10252,12 +10261,14 @@ void csrRoamCheckForLinkStatusChange( tpAniSirGlobal pMac, tSirSmeRsp *pSirMsg )
 
         case eWNI_SME_SWITCH_CHL_REQ:        // in case of STA, the SWITCH_CHANNEL originates from its AP
             smsLog( pMac, LOGW, FL("eWNI_SME_SWITCH_CHL_REQ from SME"));
+
             pSwitchChnInd = (tpSirSmeSwitchChannelInd)pSirMsg;
             //Update with the new channel id.
             //The channel id is hidden in the statusCode.
             status = csrRoamGetSessionIdFromBSSID( pMac, (tCsrBssid *)pSwitchChnInd->bssId, &sessionId );
             if( HAL_STATUS_SUCCESS( status ) )
             {
+                pRoamInfo = &roamInfo;
                 pSession = CSR_GET_SESSION( pMac, sessionId );
                 if(!pSession)
                 {
@@ -10269,6 +10280,11 @@ void csrRoamCheckForLinkStatusChange( tpAniSirGlobal pMac, tSirSmeRsp *pSirMsg )
                 {
                     pSession->pConnectBssDesc->channelId = (tANI_U8)pSwitchChnInd->newChannelId;
                 }
+                pRoamInfo->chan_info.chan_id =
+                    (tANI_U8)pSwitchChnInd->newChannelId;
+                csrRoamCallCallback(pMac, sessionId, pRoamInfo, 0,
+                        eCSR_ROAM_STA_CHANNEL_SWITCH,
+                        eCSR_ROAM_RESULT_NONE);
             }
             break;
                 
@@ -11011,7 +11027,9 @@ void csrRoamCheckForLinkStatusChange( tpAniSirGlobal pMac, tSirSmeRsp *pSirMsg )
             
         case eWNI_SME_BTAMP_LOG_LINK_IND:
             smsLog( pMac, LOG1, FL("Establish logical link req from HCI serialized through MC thread"));
+#ifdef WLAN_BTAMP_FEATURE
             btampEstablishLogLinkHdlr( pSirMsg );
+#endif
             break;
         case eWNI_SME_RSSI_IND:
             smsLog( pMac, LOG1, FL("RSSI indication from TL serialized through MC thread"));

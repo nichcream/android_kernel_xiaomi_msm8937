@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -230,6 +230,9 @@ sme_SetLinkLayerStatsIndCB
 
 
 #endif /* WLAN_FEATURE_LINK_LAYER_STATS */
+
+void sme_set_vowifi_mode(tpAniSirGlobal pMac, bool enable);
+void sme_set_qpower(tpAniSirGlobal pMac, uint8_t enable);
 
 #ifdef WLAN_FEATURE_EXTSCAN
 /* ---------------------------------------------------------------------------
@@ -762,6 +765,9 @@ tCsrScanResultInfo *sme_ScanResultGetNext(tHalHandle,
     \return eHalStatus     
   ---------------------------------------------------------------------------*/
 eHalStatus sme_ScanResultPurge(tHalHandle hHal, tScanResultHandle hScanResult);
+
+VOS_STATUS sme_update_channel_list(tpAniSirGlobal pMac);
+
 
 /* ---------------------------------------------------------------------------
     \fn sme_ScanGetPMKIDCandidateList
@@ -4061,5 +4067,13 @@ sme_get_cb_phy_mode_from_cb_ini_mode(uint32_t cb_ini_value)
 {
    return csrConvertCBIniValueToPhyCBState(cb_ini_value);
 }
+
+/**
+ * sme_request_imps() - Send IMPS request
+ * @hal: hal context
+ *
+ * Return: void
+ */
+void sme_request_imps(tHalHandle hal);
 
 #endif //#if !defined( __SME_API_H )

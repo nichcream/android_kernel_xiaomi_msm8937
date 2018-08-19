@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -483,7 +483,7 @@ tSmeCmd *smeGetCommandBuffer( tpAniSirGlobal pMac )
         else
         {
            /* Trigger SSR */
-           vos_wlanRestart();
+           vos_wlanRestart(VOS_GET_MSG_BUFF_FAILURE);
         }
     }
 
@@ -898,6 +898,68 @@ static void smeProcessNanReq(tpAniSirGlobal pMac, tSmeCmd *pCommand )
     else
     {
         smsLog(pMac, LOG1, FL("posted WDA_NAN_REQUEST command"));
+    }
+}
+
+/**
+ * sme_set_qpower() - Set Qpower
+ * @pMac - context handler
+ * @enable - uint8 value that needs to be sent to FW
+ *
+ * The function sends the qpower to firmware received
+ * via driver command
+ */
+void sme_set_qpower(tpAniSirGlobal pMac, uint8_t enable)
+{
+    tSirMsgQ msgQ;
+    tSirRetStatus retCode = eSIR_SUCCESS;
+
+    vos_mem_zero(&msgQ, sizeof(tSirMsgQ));
+    msgQ.type = WDA_QPOWER;
+    msgQ.reserved = 0;
+    msgQ.bodyval = enable;
+
+    retCode = wdaPostCtrlMsg(pMac, &msgQ);
+    if(eSIR_SUCCESS != retCode)
+    {
+        smsLog(pMac, LOGE,
+           FL("Posting WDA_QPOWER to WDA failed, reason=%X"),
+           retCode);
+    }
+    else
+    {
+        smsLog(pMac, LOG1, FL("posted WDA_QPOWER command"));
+    }
+}
+
+/**
+ * sme_set_vowifi_mode() - Set VOWIFI mode
+ * @pMac - context handler
+ * @enable - boolean value that determines the state
+ *
+ * The function sends the VOWIFI to firmware received
+ * via driver command
+ */
+void sme_set_vowifi_mode(tpAniSirGlobal pMac, bool enable)
+{
+    tSirMsgQ msgQ;
+    tSirRetStatus retCode = eSIR_SUCCESS;
+
+    vos_mem_zero(&msgQ, sizeof(tSirMsgQ));
+    msgQ.type = WDA_VOWIFI_MODE;
+    msgQ.reserved = 0;
+    msgQ.bodyval = enable;
+
+    retCode = wdaPostCtrlMsg(pMac, &msgQ);
+    if(eSIR_SUCCESS != retCode)
+    {
+        smsLog(pMac, LOGE,
+           FL("Posting WDA_VOWIFI_MODE to WDA failed, reason=%X"),
+           retCode);
+    }
+    else
+    {
+        smsLog(pMac, LOG1, FL("posted WDA_VOWIFI_MODE command"));
     }
 }
 
@@ -1684,6 +1746,32 @@ eHalStatus sme_UpdateChannelList(tHalHandle hHal)
     }
     return status;
 }
+
+/**
+ * sme_update_channel_list() - Update configured channel list to fwr
+ * This is a synchronous API.
+ *
+ * @mac_ctx - The handle returned by mac_open.
+ *
+ * Return QDF_STATUS  SUCCESS.
+ * FAILURE or RESOURCES  The API finished and failed.
+ */
+VOS_STATUS
+sme_update_channel_list(tpAniSirGlobal pMac)
+{
+    VOS_STATUS status = VOS_STATUS_SUCCESS;
+
+    status = sme_AcquireGlobalLock(&pMac->sme);
+    if (VOS_IS_STATUS_SUCCESS(status)) {
+        csrInitGetChannels(pMac);
+        csrResetCountryInformation(pMac, eANI_BOOLEAN_TRUE, eANI_BOOLEAN_TRUE);
+        csrScanFilterResults(pMac);
+        sme_ReleaseGlobalLock(&pMac->sme);
+    }
+
+    return status;
+}
+
 
 /*--------------------------------------------------------------------------
 
@@ -2645,22 +2733,40 @@ eHalStatus sme_ProcessMsg(tHalHandle hHal, vos_msg_t* pMsg)
                 if(pMsg->bodyptr)
                 {
                    tSirSmeCoexInd *pSmeCoexInd = (tSirSmeCoexInd *)pMsg->bodyptr;
+                   vos_msg_t vosMessage = {0};
 
                    if (pSmeCoexInd->coexIndType == SIR_COEX_IND_TYPE_DISABLE_AGGREGATION_IN_2p4)
                    {
+                       pMac->btc.agg_disabled = true;
                        smsLog( pMac, LOG1, FL("SIR_COEX_IND_TYPE_DISABLE_AGGREGATION_IN_2p4"));
                        sme_RequestFullPower(hHal, NULL, NULL, eSME_REASON_OTHER);
                        pMac->isCoexScoIndSet = 1;
                        pMac->scan.fRestartIdleScan = eANI_BOOLEAN_FALSE;
                        pMac->scan.fCancelIdleScan = eANI_BOOLEAN_TRUE;
+
+                       vosMessage.type = eWNI_SME_STA_DEL_BA_REQ;
+                       vos_mq_post_message(VOS_MQ_ID_PE, &vosMessage);
                    }
                    else if (pSmeCoexInd->coexIndType == SIR_COEX_IND_TYPE_ENABLE_AGGREGATION_IN_2p4)
                    {
+                       pMac->btc.agg_disabled = false;
                        smsLog( pMac, LOG1, FL("SIR_COEX_IND_TYPE_ENABLE_AGGREGATION_IN_2p4"));
                        pMac->isCoexScoIndSet = 0;
                        sme_RequestBmps(hHal, NULL, NULL);
                        pMac->scan.fRestartIdleScan = eANI_BOOLEAN_TRUE;
                        pMac->scan.fCancelIdleScan = eANI_BOOLEAN_FALSE;
+
+                       /*
+                        * If aggregation during SCO is enabled, there is a
+                        * possibility for an active BA session. This session
+                        * should be deleted on receiving enable aggregation
+                        * indication and block ack buffer size should be reset
+                        * to default.
+                        */
+                       if (pMac->roam.configParam.agg_btc_sco_enabled) {
+                           vosMessage.type = eWNI_SME_STA_DEL_BA_REQ;
+                           vos_mq_post_message(VOS_MQ_ID_PE, &vosMessage);
+                       }
                    }
 
                    status = btcHandleCoexInd((void *)pMac, pMsg->bodyptr);
@@ -12759,7 +12865,7 @@ void activeListCmdTimeoutHandle(void *userData)
        if (!(vos_isLoadUnloadInProgress() ||
            vos_is_logp_in_progress(VOS_MODULE_ID_SME, NULL)))
        {
-          vos_wlanRestart();
+          vos_wlanRestart(VOS_ACTIVE_LIST_TIMEOUT);
        }
     }
 }
@@ -14186,7 +14292,7 @@ tANI_BOOLEAN sme_handleSetFccChannel(tHalHandle hHal, tANI_U8 fcc_constraint,
             pMac->scan.defer_update_channel_list = true;
         } else {
             /* update the channel list to the firmware */
-            csrUpdateChannelList(pMac);
+            csrUpdateFCCChannelList(pMac);
         }
     }
 
@@ -15199,4 +15305,11 @@ sme_get_connect_strt_time(tHalHandle hal, uint8_t session_id)
    }
    session = CSR_GET_SESSION(mac_ctx, session_id);
    return session->connect_req_start_time;
+}
+
+void sme_request_imps(tHalHandle hal)
+{
+   tpAniSirGlobal mac_ctx = PMAC_STRUCT(hal);
+
+   csrScanStartIdleScan(mac_ctx);
 }

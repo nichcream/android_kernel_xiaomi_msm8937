@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -722,6 +722,9 @@ WLANTL_Open
   pTLCb->tlConfigInfo.uDelayedTriggerFrmInt =
                 pTLConfig->uDelayedTriggerFrmInt;
 
+  pTLCb->tlConfigInfo.ucIsReplayCheck =
+                pTLConfig->ucIsReplayCheck;
+
   /*------------------------------------------------------------------------
     Allocate internal resources
    ------------------------------------------------------------------------*/
@@ -843,7 +846,8 @@ WLANTL_Start
   vos_atomic_set_U8( &pTLCb->ucTxSuspended, 0);
   pTLCb->uResCount = uResCount;
 
-  vos_timer_start(&pTLCb->tx_frames_timer, WLANTL_SAMPLE_INTERVAL);
+  if (IS_FEATURE_SUPPORTED_BY_FW(SAP_BUFF_ALLOC))
+    vos_timer_start(&pTLCb->tx_frames_timer, WLANTL_SAMPLE_INTERVAL);
 
   return VOS_STATUS_SUCCESS;
 }/* WLANTL_Start */
@@ -1522,7 +1526,9 @@ WLANTL_RegisterSTAClient
   vos_copy_macaddr( &pClientSTA->wSTADesc.vSelfMACAddress, &pwSTADescType->vSelfMACAddress);
 
   /* In volans release L replay check is done at TL */
-  pClientSTA->ucIsReplayCheckValid = pwSTADescType->ucIsReplayCheckValid;
+  if (pTLCb->tlConfigInfo.ucIsReplayCheck)
+     pClientSTA->ucIsReplayCheckValid = pwSTADescType->ucIsReplayCheckValid;
+
   pClientSTA->ulTotalReplayPacketsDetected =  0;
 /*Clear replay counters of the STA on all TIDs*/
   for(ucTid = 0; ucTid < WLANTL_MAX_TID ; ucTid++)
@@ -6159,6 +6165,75 @@ static void WLANTL_SampleRxRSSI(WLANTL_CbType* pTLCb, void * pBDHeader,
    }
 }
 
+/**
+ * WLANTL_StaMonRX - Send packets to monitor mode
+ * @pTLCb: TL context pointer
+ * @pFrame: Rx buffer pointer
+ * @pBDHeader: RX Meta data pointer
+ * @sta_id: Station ID
+ *
+ * Return: true if RX monitor mode or false otherwise
+ */
+static bool WLANTL_StaMonRX(WLANTL_CbType* pTLCb, vos_pkt_t *pFrame,
+                            WDI_DS_RxMetaInfoType *pRxMetadata,
+                            uint8_t sta_id)
+{
+   WLANTL_STAClientType *pClientSTA = NULL;
+   tpSirMacMgmtHdr pHdr = NULL;
+   v_MACADDR_t *peerMacAddr = NULL;
+   uint8_t i = 0;
+   uint8_t addr1_index = WDA_GET_RX_ADDR1_IDX(pRxMetadata);
+   bool tp_data = false;
+
+   pHdr = (tpSirMacMgmtHdr)pRxMetadata->mpduHeaderPtr;
+   peerMacAddr = (v_MACADDR_t *)pHdr->da;
+
+   if (vos_check_monitor_state() == false)
+       return false;
+
+   if ((addr1_index == 254) &&
+       WLANTL_IS_DATA_FRAME(WDA_GET_RX_TYPE_SUBTYPE(pRxMetadata)) &&
+       !pRxMetadata->bcast) {
+       tp_data = true;
+   } else if (WLANTL_STA_ID_MONIFACE(sta_id) == 0) {
+       return false;
+   }
+
+   if (WLANTL_IS_MGMT_FRAME(WDA_GET_RX_TYPE_SUBTYPE(pRxMetadata)) || tp_data) {
+
+      if (pRxMetadata->bcast)
+         return false;
+
+      for (i = 0; i < WLAN_MAX_STA_COUNT; i++) {
+         if (NULL == pTLCb->atlSTAClients[i])
+            continue;
+         if (0 == pTLCb->atlSTAClients[i]->ucExists)
+            continue;
+         if (WLANTL_STA_AUTHENTICATED == pTLCb->atlSTAClients[i]->tlState)
+            break;
+      }
+
+      if (i == WLAN_MAX_STA_COUNT) {
+          if (tp_data)
+              return true;
+
+         return false;
+      }
+
+      pClientSTA = pTLCb->atlSTAClients[i];
+
+      if (vos_is_macaddr_equal(peerMacAddr,
+          &pClientSTA->wSTADesc.vSelfMACAddress))
+         return false;
+
+      if (vos_is_macaddr_equal(peerMacAddr, &pTLCb->spoofMacAddr.spoofMac) &&
+          !tp_data)
+          return false;
+   }
+
+   return true;
+}
+
 /*==========================================================================
 
   FUNCTION    WLANTL_RxFrames
@@ -6227,6 +6302,7 @@ WLANTL_RxFrames
   uint16_t           seq_no;
   u64                pn_num;
   uint16_t           usEtherType = 0;
+  bool               sta_mon_data = false;
 
   /*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -*/
 
@@ -6271,16 +6347,6 @@ WLANTL_RxFrames
 
     vos_pkt_walk_packet_chain( vosDataBuff, &vosDataBuff, 1/*true*/ );
 
-    if( vos_get_conparam() == VOS_MONITOR_MODE )
-      {
-         if( pTLCb->isConversionReq )
-            WLANTL_MonTranslate80211To8023Header(vosTempBuff, pTLCb);
-
-         pTLCb->pfnMonRx(pvosGCtx, vosTempBuff, pTLCb->isConversionReq);
-         vosTempBuff = vosDataBuff;
-         continue;
-      }
-
     /*---------------------------------------------------------------------
       Peek at BD header - do not remove
       !!! Optimize me: only part of header is needed; not entire one
@@ -6295,6 +6361,25 @@ WLANTL_RxFrames
       vos_pkt_return_packet(vosTempBuff);
       vosTempBuff = vosDataBuff;
       continue;
+    }
+
+    /*---------------------------------------------------------------------
+         Check if frame is for monitor interface
+       ---------------------------------------------------------------------*/
+    ucSTAId = (v_U8_t)WDA_GET_RX_STAID(pvBDHeader);
+
+    sta_mon_data = WLANTL_StaMonRX(pTLCb, vosTempBuff, pvBDHeader, ucSTAId);
+
+    if (vos_get_conparam() == VOS_MONITOR_MODE || sta_mon_data)
+    {
+        sta_mon_data = false;
+
+        if( pTLCb->isConversionReq )
+            WLANTL_MonTranslate80211To8023Header(vosTempBuff, pTLCb);
+
+        pTLCb->pfnMonRx(pvosGCtx, vosTempBuff, pTLCb->isConversionReq);
+        vosTempBuff = vosDataBuff;
+        continue;
     }
 
     /*---------------------------------------------------------------------
@@ -6414,6 +6499,7 @@ WLANTL_RxFrames
       seq_no = (uint16_t)WDA_GET_RX_REORDER_CUR_PKT_SEQ_NO(pvBDHeader);
       pn_num = WDA_GET_RX_REPLAY_COUNT(pvBDHeader);
 
+      vosTempBuff->pn_replay_skip = 0;
       vosTempBuff->pn_num = pn_num;
 
       TLLOG2(VOS_TRACE( VOS_MODULE_ID_TL, VOS_TRACE_LEVEL_INFO_HIGH,
@@ -6545,11 +6631,13 @@ WLANTL_RxFrames
               }
               else
               {
-                  TLLOGW(VOS_TRACE( VOS_MODULE_ID_TL, VOS_TRACE_LEVEL_WARN,
-                           "%s: staId %d doesn't exist, but mapped to AP staId %d", __func__,
-                           ucSTAId, ucAddr3STAId));
+                  VOS_TRACE(VOS_MODULE_ID_TL, VOS_TRACE_LEVEL_ERROR,
+                            "staId %d doesn't exist"
+                            " but mapped to AP staId %d PN:[0x%llX]",
+                            ucSTAId, ucAddr3STAId, pn_num);
                   ucSTAId = ucAddr3STAId;
                   pClientSTA = pTLCb->atlSTAClients[ucAddr3STAId];
+                  vosTempBuff->pn_replay_skip = 1;
               }
           }
       }
@@ -7743,7 +7831,7 @@ WLANTL_FatalErrorHandler
     * Issue SSR. vos_wlanRestart has tight checks to make sure that
     * we do not send an FIQ if previous FIQ is not processed
     */
-   vos_wlanRestart();
+   vos_wlanRestart(VOS_REASON_UNSPECIFIED);
 }
 
 /*==========================================================================
@@ -9693,10 +9781,10 @@ WLANTL_STARxAuth
                                  (v_PVOID_t)STAMetaInfoPtr);
     }
 
-  /*------------------------------------------------------------------------
-    Check to see if re-ordering session is in place
-   ------------------------------------------------------------------------*/
-  if ( 0 != pClientSTA->atlBAReorderInfo[ucTid].ucExists )
+  /* Check to see if re-ordering session is in place.
+     Skip add to reorder list for TDLS packet on AP staid*/
+  if (0 != pClientSTA->atlBAReorderInfo[ucTid].ucExists  &&
+      !vosDataBuff->pn_replay_skip)
   {
     WLANTL_MSDUReorder( pTLCb, &vosDataBuff, aucBDHeader, ucSTAId, ucTid );
   }
@@ -9708,7 +9796,8 @@ if(WLANTL_IS_DATA_FRAME(WDA_GET_RX_TYPE_SUBTYPE(aucBDHeader)) &&
 #endif
 )
 {
-  /* replay check code : check whether replay check is needed or not */
+  /* replay check code : check whether replay check is needed or not
+     Skip replay check for TDLS traffic with AP sta id */
   if(VOS_TRUE == pClientSTA->ucIsReplayCheckValid)
   {
       /* replay check is needed for the station */
@@ -9764,6 +9853,7 @@ if(WLANTL_IS_DATA_FRAME(WDA_GET_RX_TYPE_SUBTYPE(aucBDHeader)) &&
       else
       {
            v_BOOL_t status;
+           uint16_t seq_no = (uint16_t)WDA_GET_RX_REORDER_CUR_PKT_SEQ_NO(aucBDHeader);
 
            /* Getting 48-bit replay counter from the RX BD */
            ullcurrentReplayCounter = WDA_DS_GetReplayCounter(aucBDHeader);
@@ -9780,7 +9870,7 @@ if(WLANTL_IS_DATA_FRAME(WDA_GET_RX_TYPE_SUBTYPE(aucBDHeader)) &&
            /* It is not AMSDU frame so perform 
               reaply check for each packet, as
               each packet contains valid replay counter*/
-           if (vosDataBuff != NULL) {
+           if (vosDataBuff != NULL && !vosDataBuff->pn_replay_skip) {
               if (vos_is_pkt_chain(vosDataBuff)) {
                  WLANTL_ReorderReplayCheck(pClientSTA, &vosDataBuff, ucTid);
               } else {
@@ -9789,10 +9879,13 @@ if(WLANTL_IS_DATA_FRAME(WDA_GET_RX_TYPE_SUBTYPE(aucBDHeader)) &&
                  if(VOS_FALSE == status) {
                     /* Not a replay paket, update previous replay counter in TL CB */
                     pClientSTA->ullReplayCounter[ucTid] = ullcurrentReplayCounter;
+                    pClientSTA->last_seq_no[ucTid] = seq_no;
                  } else {
                     VOS_TRACE(VOS_MODULE_ID_TL, VOS_TRACE_LEVEL_ERROR,
-                    "WLAN TL: Non AMSDU Drop replay packet with PN: [0x%llX], prevPN: [0x%llx]",
-                    ullcurrentReplayCounter, ullpreviousReplayCounter);
+                    "Non AMSDU Drop replay with PN: [0x%llX], prevPN: [0x%llx]"
+                    " seq_no:%d last_seq_no:%d",
+                    ullcurrentReplayCounter, ullpreviousReplayCounter, seq_no,
+                    pClientSTA->last_seq_no[ucTid]);
 
                     pClientSTA->ulTotalReplayPacketsDetected++;
                     VOS_TRACE( VOS_MODULE_ID_TL, VOS_TRACE_LEVEL_ERROR,
@@ -14404,8 +14497,8 @@ void WLANTL_RegisterFwdEapol(v_PVOID_t pvosGCtx,
    WLANTL_CbType* pTLCb = NULL;
    pTLCb = VOS_GET_TL_CB(pvosGCtx);
 
-   pTLCb->pfnEapolFwd = pfnFwdEapol;
-
+   if (pTLCb)
+      pTLCb->pfnEapolFwd = pfnFwdEapol;
 }
 
  /**

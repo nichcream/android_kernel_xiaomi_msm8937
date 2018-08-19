@@ -158,6 +158,7 @@ typedef enum {
    FATAL_EVENT_LOGGING = 69,
    /*70 reserved for WIFI_DUAL_BAND_ENABLE */
    PROBE_RSP_TEMPLATE_VER1 = 71,
+   STA_MONITOR_SCC = 72,
    //MAX_FEATURE_SUPPORTED = 128
 } placeHolderInCapBitmap;
 
@@ -699,8 +700,6 @@ typedef struct sSirMbMsgP2p
 
 #define SIR_HAL_SET_MAX_TX_POWER_PER_BAND_REQ \
         (SIR_HAL_ITC_MSG_TYPES_BEGIN + 229)
-#define SIR_HAL_SET_MAX_TX_POWER_PER_BAND_RSP \
-        (SIR_HAL_ITC_MSG_TYPES_BEGIN + 230)
 
 #define SIR_HAL_BCN_MISS_RATE_REQ         (SIR_HAL_ITC_MSG_TYPES_BEGIN + 231)
 
@@ -810,6 +809,9 @@ typedef struct sSirMbMsgP2p
 /* ARP Debug stats */
 #define SIR_HAL_SET_ARP_STATS_REQ          (SIR_HAL_ITC_MSG_TYPES_BEGIN + 303)
 #define SIR_HAL_GET_ARP_STATS_REQ          (SIR_HAL_ITC_MSG_TYPES_BEGIN + 304)
+#define SIR_HAL_VOWIFI_MODE                (SIR_HAL_ITC_MSG_TYPES_BEGIN + 306)
+#define SIR_HAL_QPOWER                     (SIR_HAL_ITC_MSG_TYPES_BEGIN + 307)
+
 
 #define SIR_HAL_MSG_TYPES_END              (SIR_HAL_MSG_TYPES_BEGIN + 0x1FF)
 

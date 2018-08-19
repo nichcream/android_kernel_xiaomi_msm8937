@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -98,6 +98,7 @@ VOS_STATUS btcOpen (tHalHandle hHal)
    pMac->btc.btcHBActive = VOS_TRUE;
    pMac->btc.btc_scan_compromise_esco = false;
    pMac->btc.btc_scan_compromise_sco = false;
+   pMac->btc.agg_disabled = false;
 
    for (i = 0; i < MWS_COEX_MAX_VICTIM_TABLE; i++)
    {
@@ -2024,6 +2025,18 @@ eHalStatus btcHandleCoexInd(tHalHandle hHal, void* pMsg)
                     "for BSSID "MAC_ADDRESS_STR,__func__,
                     MAC_ADDR_ARRAY(pMac->btc.btcBssfordisableaggr));
          }
+         if (pMac->roam.configParam.agg_btc_sco_enabled) {
+             /*
+              * If aggregation during SCO is enabled, first all BA sessions
+              * are deleted and then aggregation is re-enabled with configured
+              * block ack buffer as per SCO ini param.
+              */
+             ccmCfgSetInt(pMac, WNI_CFG_NUM_BUFF_ADVERT,
+                          pMac->roam.configParam.num_ba_buff_btc_sco, NULL,
+                          eANI_BOOLEAN_FALSE);
+             ccmCfgSetInt(pMac, WNI_CFG_DEL_ALL_RX_TX_BA_SESSIONS_2_4_G_BTC, 0,
+                          NULL, eANI_BOOLEAN_FALSE);
+         }
      }
      else if (pSmeCoexInd->coexIndType == SIR_COEX_IND_TYPE_ENABLE_AGGREGATION_IN_2p4)
      {
@@ -2034,6 +2047,11 @@ eHalStatus btcHandleCoexInd(tHalHandle hHal, void* pMsg)
              smsLog(pMac, LOGW,
              "Coex indication in %s(), type - SIR_COEX_IND_TYPE_ENABLE_AGGREGATION_IN_2p4",
                  __func__);
+         }
+         if (pMac->roam.configParam.agg_btc_sco_enabled) {
+             ccmCfgSetInt(pMac, WNI_CFG_NUM_BUFF_ADVERT,
+                          pMac->roam.configParam.num_ba_buff,
+                          NULL, eANI_BOOLEAN_FALSE);
          }
      }
      else if (pSmeCoexInd->coexIndType == SIR_COEX_IND_TYPE_DISABLE_UAPSD)
