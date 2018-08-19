@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2014, 2017 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2014, 2017-2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -1100,6 +1100,8 @@ typedef struct sAniSirGlobal
 #endif /* SAP_AUTH_OFFLOAD */
    bool max_power_cmd_pending;
    uint32_t sta_auth_retries_for_code17;
+   uint32_t sta_sap_scc_on_dfs_chan;
+   bool force_scc_with_ecsa;
 } tAniSirGlobal;
 
 #ifdef FEATURE_WLAN_TDLS

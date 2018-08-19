@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -200,6 +200,9 @@ when        who    what, where, why
 /*-------------------------------------------------------------------------
   Helper macros
 ---------------------------------------------------------------------------*/
+ /*Checks STAID for MONITOR interface*/
+#define WLANTL_STA_ID_MONIFACE( _staid )( _staid == 253 || _staid == 254 || _staid == 255 )
+
  /*Checks STA index validity*/
 #define WLANTL_STA_ID_INVALID( _staid )( _staid >= WLAN_MAX_STA_COUNT )
 
@@ -699,6 +702,9 @@ typedef struct
 
  /* It contains 48-bit replay counter per TID*/
   v_U64_t       ullReplayCounter[WLANTL_MAX_TID];
+
+  /* Last seq number received on Tid */
+  v_U16_t      last_seq_no[WLANTL_MAX_TID];
 
  /* It contains no of replay packets found per STA.
     It is for debugging purpose only.*/

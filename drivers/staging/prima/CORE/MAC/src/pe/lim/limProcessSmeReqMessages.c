@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2017 The Linux Foundation. All rights reserved.
+ * Copyright (c) 2012-2018 The Linux Foundation. All rights reserved.
  *
  * Previously licensed under the ISC license by Qualcomm Atheros, Inc.
  *
@@ -58,6 +58,7 @@
 #include "limSendMessages.h"
 #include "limApi.h"
 #include "wmmApsd.h"
+#include "limSessionUtils.h"
 
 #ifdef WLAN_FEATURE_RMC
 #include "limRMC.h"
@@ -1120,6 +1121,8 @@ static eHalStatus limSendHalStartScanOffloadReq(tpAniSirGlobal pMac,
     tSirMsgQ msg;
     tANI_U16 i, len;
     tSirRetStatus rc = eSIR_SUCCESS;
+    if (pScanReq->channelList.numChannels > SIR_ESE_MAX_MEAS_IE_REQS)
+        pScanReq->channelList.numChannels = SIR_ESE_MAX_MEAS_IE_REQS;
 
     /* The tSirScanOffloadReq will reserve the space for first channel,
        so allocate the memory for (numChannels - 1) and uIEFieldLen */
@@ -1260,11 +1263,12 @@ __limProcessSmeScanReq(tpAniSirGlobal pMac, tANI_U32 *pMsgBuf)
     sirCopyMacAddr(pMac->lim.gSelfMacAddr,  pScanReq->selfMacAddr);
 
    /* Check if scan req is not valid or link is already suspended*/
-    if (!limIsSmeScanReqValid(pMac, pScanReq) || limIsLinkSuspended(pMac))
+    if (!limIsSmeScanReqValid(pMac, pScanReq) ||
+        limIsLinkSuspended(pMac) || limIsChanSwitchRunning(pMac))
     {
         limLog(pMac, LOGE,
-         FL("Received SME_SCAN_REQ with invalid params or link is suspended %d"),
-          limIsLinkSuspended(pMac));
+         FL("Received SME_SCAN_REQ with invalid params or link is suspended %d limIsChanSwitchRunning %d"),
+          limIsLinkSuspended(pMac), limIsChanSwitchRunning(pMac));
 
         if (pMac->lim.gLimRspReqd)
         {
@@ -4140,6 +4144,11 @@ __lim_process_sme_assoc_offload_cnf(tpAniSirGlobal pmac,
                 eLIM_CNF_WAIT_TIMER,
                 aid);
     }
+    else
+    {
+      limLog(pmac, LOGE, FL("NULL sta_ds"));
+      goto end;
+    }
     if (assoc_cnf.statusCode == eSIR_SME_SUCCESS)
     {
       sta_ds->mlmStaContext.mlmState = eLIM_MLM_LINK_ESTABLISHED_STATE;
@@ -5629,16 +5638,7 @@ static void lim_register_mgmt_frame_ind_cb(tpAniSirGlobal pMac,
       limLog(pMac, LOGE, FL("sme_req->callback is null"));
 }
 
-/**
- * lim_send_chan_switch_action_frame() - send channel switch action frame to all
- * connected peers
- * @mac_ctx: Pointer to Global MAC structure
- * @new_channel: new channel
- * @session_entry: ap session
- *
- * Return: None
- */
-static void lim_send_chan_switch_action_frame(tpAniSirGlobal mac_ctx,
+void lim_send_chan_switch_action_frame(tpAniSirGlobal mac_ctx,
      uint16_t new_channel, tpPESession session_entry)
 {
    uint16_t op_class;
