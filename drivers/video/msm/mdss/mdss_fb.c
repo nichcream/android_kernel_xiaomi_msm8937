@@ -296,6 +296,19 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 	MDSS_BRIGHT_TO_BL(bl_lvl, value, mfd->panel_info->bl_max,
 				mfd->panel_info->brightness_max);
 
+#if 1
+	/* Allow for more precise adjustments for the first
+	   10% of the brightness */
+	if (value <= 30) {
+		int bl_cap = bl_lvl;
+		MDSS_BRIGHT_TO_BL(bl_lvl, value, bl_cap, 40);
+	}
+
+	/* Make minimum brightness great again */
+	if (value <= 3)
+		bl_lvl = mfd->panel_info->bl_min;
+#endif
+
 	if (!bl_lvl && value)
 		bl_lvl = 1;
 	pr_debug("bl_lvl is %d, value is %d\n", bl_lvl, value);
