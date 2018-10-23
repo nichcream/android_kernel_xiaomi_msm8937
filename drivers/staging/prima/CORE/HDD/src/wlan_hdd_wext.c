@@ -839,7 +839,7 @@ int hdd_wlan_get_freq(v_U32_t channel, v_U32_t *pfreq)
             if (channel == freq_chan_map[i].chan)
             {
                 *pfreq = freq_chan_map[i].freq;
-                return 1;
+                return 0;
             }
         }
     }
@@ -1841,7 +1841,7 @@ static int __iw_get_freq(struct net_device *dev,
        else
        {
            status = hdd_wlan_get_freq(channel, &freq);
-           if( TRUE == status )
+           if( 0 == status )
            {
                /* Set Exponent parameter as 6 (MHZ) in struct iw_freq
                 * iwlist & iwconfig command shows frequency into proper
@@ -2104,7 +2104,8 @@ static int __iw_set_bitrate(struct net_device *dev,
     hdd_wext_state_t *pWextState;
     hdd_station_ctx_t *pHddStaCtx;
     hdd_context_t *pHddCtx;
-    v_U8_t supp_rates[WNI_CFG_SUPPORTED_RATES_11A_LEN];
+    v_U8_t supp_rates[WNI_CFG_SUPPORTED_RATES_11A_LEN +
+                      WNI_CFG_SUPPORTED_RATES_11B_LEN];
     v_U32_t a_len = WNI_CFG_SUPPORTED_RATES_11A_LEN;
     v_U32_t b_len = WNI_CFG_SUPPORTED_RATES_11B_LEN;
     v_U32_t i, rate;
@@ -2167,7 +2168,7 @@ static int __iw_set_bitrate(struct net_device *dev,
                         supp_rates, &a_len) == eHAL_STATUS_SUCCESS) &&
                 (ccmCfgGetStr(WLAN_HDD_GET_HAL_CTX(pAdapter),
                         WNI_CFG_SUPPORTED_RATES_11B,
-                        supp_rates, &b_len) == eHAL_STATUS_SUCCESS))
+                        supp_rates + a_len, &b_len) == eHAL_STATUS_SUCCESS))
             {
                 for (i = 0; i < (b_len + a_len); ++i)
                 {
@@ -9165,6 +9166,7 @@ int wlan_hdd_set_filter(hdd_adapter_t *pAdapter, tpPacketFilterCfg pRequest)
             {
                 hddLog(VOS_TRACE_LEVEL_ERROR, "%s: Failure to execute Clear Filter",
                         __func__);
+                hdd_request_put(request);
                 return -EINVAL;
             }
 
