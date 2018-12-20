@@ -1,6 +1,3 @@
-#ifdef CONFIG_MACH_XIAOMI_LAND
-#include "msmb_pproc-land.h"
-#else
 #ifndef __MSMB_PPROC_H
 #define __MSMB_PPROC_H
 
@@ -155,4 +152,3 @@ struct msm_camera_v4l2_ioctl32_t {
 #endif
 
 #endif
-#endif /* XIAOMI_LAND */

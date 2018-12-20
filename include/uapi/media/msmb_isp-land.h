@@ -1,16 +1,5 @@
-/* Copyright (c) 2014-2015, The Linux Foundation. All rights reserved.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 and
- * only version 2 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
-#ifndef __MSMB_ISP__
-#define __MSMB_ISP__
+#ifndef __UAPI_MSMB_ISP__
+#define __UAPI_MSMB_ISP__
 
 #include <linux/videodev2.h>
 
@@ -767,22 +756,6 @@ struct msm_isp_event_data {
 	} u; /* union can have max 52 bytes */
 };
 
-#ifdef CONFIG_COMPAT
-struct msm_isp_event_data32 {
-	struct compat_timeval timestamp;
-	struct compat_timeval mono_timestamp;
-	uint32_t frame_id;
-	union {
-		struct msm_isp_stats_event stats;
-		struct msm_isp_buf_event buf_done;
-		struct msm_isp_fetch_eng_event fetch_done;
-		struct msm_isp_error_info error_info;
-		struct msm_isp_output_info output_info;
-		struct msm_isp_sof_info sof_info;
-	} u;
-};
-#endif
-
 #define V4L2_PIX_FMT_QBGGR8  v4l2_fourcc('Q', 'B', 'G', '8')
 #define V4L2_PIX_FMT_QGBRG8  v4l2_fourcc('Q', 'G', 'B', '8')
 #define V4L2_PIX_FMT_QGRBG8  v4l2_fourcc('Q', 'G', 'R', '8')
@@ -803,6 +776,10 @@ struct msm_isp_event_data32 {
 #define V4L2_PIX_FMT_P16GBRG10 v4l2_fourcc('P', 'G', 'B', '0')
 #define V4L2_PIX_FMT_P16GRBG10 v4l2_fourcc('P', 'G', 'R', '0')
 #define V4L2_PIX_FMT_P16RGGB10 v4l2_fourcc('P', 'R', 'G', '0')
+#define V4L2_PIX_FMT_P16BGGR12 v4l2_fourcc('P', 'B', 'G', '2')
+#define V4L2_PIX_FMT_P16GBRG12 v4l2_fourcc('P', 'G', 'B', '2')
+#define V4L2_PIX_FMT_P16GRBG12 v4l2_fourcc('P', 'G', 'R', '2')
+#define V4L2_PIX_FMT_P16RGGB12 v4l2_fourcc('P', 'R', 'G', '2')
 #define V4L2_PIX_FMT_NV14 v4l2_fourcc('N', 'V', '1', '4')
 #define V4L2_PIX_FMT_NV41 v4l2_fourcc('N', 'V', '4', '1')
 #define V4L2_PIX_FMT_META v4l2_fourcc('Q', 'M', 'E', 'T')

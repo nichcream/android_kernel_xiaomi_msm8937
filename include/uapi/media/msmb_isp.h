@@ -1,3 +1,6 @@
+#ifdef CONFIG_MACH_XIAOMI_LAND
+#include "msmb_isp-land.h"
+#else
 #ifndef __UAPI_MSMB_ISP__
 #define __UAPI_MSMB_ISP__
 
@@ -1096,3 +1099,5 @@ enum msm_isp_ioctl_cmd_code {
 	_IOWR('V', BASE_VIDIOC_PRIVATE+21, struct msm_isp32_event_data)
 
 #endif/* __MSMB_ISP__ */
+#endif /* CONFIG_MACH_XIAOMI_LAND */
+
