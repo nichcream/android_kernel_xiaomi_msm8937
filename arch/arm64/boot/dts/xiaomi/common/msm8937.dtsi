@@ -32,6 +32,14 @@
 				"iface_clk", "bus_clk";
 		qcom,ce-opp-freq = <100000000>;
 	};
+
+	qcom,msm-imem@8600000 {
+		/delete-node/ dload_type@1c;
+		dload_type@18 {
+			compatible = "qcom,msm-imem-dload-type";
+			reg = <0x18 4>;
+		};
+	};
 };
 
 &firmware {
