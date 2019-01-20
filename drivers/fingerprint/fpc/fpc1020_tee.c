@@ -285,6 +285,7 @@ static ssize_t spi_prepare_set(struct device *dev,
 }
 static DEVICE_ATTR(spi_prepare, S_IWUSR, NULL, spi_prepare_set);
 
+#ifndef CONFIG_MACH_XIAOMI_SANTONI
 /**
  * sysfs node for controlling whether the driver is allowed
  * to wake up the platform on interrupt.
@@ -306,6 +307,7 @@ static ssize_t wakeup_enable_set(struct device *dev,
 	return count;
 }
 static DEVICE_ATTR(wakeup_enable, S_IWUSR, NULL, wakeup_enable_set);
+#endif
 
 
 /**
@@ -435,7 +437,9 @@ static struct attribute *attributes[] = {
 	&dev_attr_pinctl_set.attr,
 	&dev_attr_spi_prepare.attr,
 	&dev_attr_hw_reset.attr,
+#ifndef CONFIG_MACH_XIAOMI_SANTONI
 	&dev_attr_wakeup_enable.attr,
+#endif
 	&dev_attr_compatible_all.attr,
 #ifdef LINUX_CONTROL_SPI_CLK
 	&dev_attr_clk_enable.attr,
@@ -532,6 +536,9 @@ static int fpc1020_probe(struct platform_device *pdev)
 #endif
 
 	fpc1020->wakeup_enabled = false;
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	fpc1020->wakeup_enabled = true;
+#endif
 #ifdef LINUX_CONTROL_SPI_CLK
 	fpc1020->clocks_enabled = false;
 	fpc1020->clocks_suspended = false;
