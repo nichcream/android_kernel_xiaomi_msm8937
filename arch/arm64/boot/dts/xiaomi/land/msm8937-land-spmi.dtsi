@@ -63,6 +63,10 @@
 		<0x53 0x80 0x32 0x81 0x07 0x82 0x13 0x83 0xffffffff>;
 };
 
+&pmi_haptic {
+	qcom,vmax-mv = <2700>;
+};
+
 &pmi8950_charger {
 	qcom,qpnp-smbcharger {
 			/delete-property/qcom,float-voltage-mv;
