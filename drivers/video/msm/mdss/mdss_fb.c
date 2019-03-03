@@ -4930,7 +4930,8 @@ int mdss_fb_do_ioctl(struct fb_info *info, unsigned int cmd,
 		break;
 
 	case MSMFB_ENHANCE_SET_GAMMA:
-		if (copy_from_user(&Color_mode, argp, sizeof(Color_mode))) {
+		ret = copy_from_user(&Color_mode, argp, sizeof(Color_mode));
+		if (ret) {
 			pr_err("%s: MSMFB_ENHANCE_SET_GAMMA ioctl failed\n", __func__);
 			goto exit;
 		}
@@ -4938,7 +4939,8 @@ int mdss_fb_do_ioctl(struct fb_info *info, unsigned int cmd,
 		break;
 
 	case MSMFB_ENHANCE_SET_CE:
-		if (copy_from_user(&CE_mode, argp, sizeof(CE_mode))) {
+		ret = copy_from_user(&CE_mode, argp, sizeof(CE_mode));
+		if (ret) {
 			pr_err("%s: MSMFB_ENHANCE_SET_CE ioctl failed\n", __func__);
 			goto exit;
 		}
