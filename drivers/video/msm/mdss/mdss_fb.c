@@ -276,6 +276,17 @@ static int mdss_fb_notify_update(struct msm_fb_data_type *mfd,
 
 static int lcd_backlight_registered;
 
+#define MAX_BL_LUTS 7
+static int backlight_luts[MAX_BL_LUTS] = {
+	5,   // x = 1 : original bl = 5
+	6,   // 2 : 21
+	8,   // 3 : 37
+	12,  // 4 : 53
+	17,  // 5 : 69
+	25,  // 6 : 85
+	38,  // 7 : 101
+};
+
 #define LINEAR_CONVERT(v_old, min_new, max_new, min_old, max_old) \
 				((((v_old - min_old) * (max_new - min_new)) / (max_old - min_old)) + min_new)
 
@@ -283,6 +294,14 @@ static int lcd_backlight_registered;
 				if (v <= min_bright) out = bl_min; \
 				else \
 				out = LINEAR_CONVERT(v, bl_min, bl_max, min_bright, max_bright); \
+				} while (0)
+
+#define MDSS_BRIGHT_TO_BL2(out, v, bl_min, bl_max, min_bright, max_bright) do {\
+				if (v <= min_bright) out = bl_min; \
+				else if (v <= MAX_BL_LUTS) out = backlight_luts[v - 1]; \
+				else \
+				out = LINEAR_CONVERT(v, backlight_luts[MAX_BL_LUTS - 1], bl_max, \
+					MAX_BL_LUTS + 1, max_bright); \
 				} while (0)
 
 static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
@@ -304,8 +323,15 @@ static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
 #if 1
 	if (mfd->panel_info->bl_min < 5)
 		mfd->panel_info->bl_min = 5;
-	MDSS_BRIGHT_TO_BL1(bl_lvl, value, mfd->panel_info->bl_min, mfd->panel_info->bl_max,
-			1, mfd->panel_info->brightness_max);
+
+	if (mfd->panel_info->bl_max == 4095) {
+		/* Provide a smoother transition on the lows */
+		MDSS_BRIGHT_TO_BL2(bl_lvl, value, mfd->panel_info->bl_min, mfd->panel_info->bl_max,
+				1, mfd->panel_info->brightness_max);
+	} else {
+		MDSS_BRIGHT_TO_BL1(bl_lvl, value, mfd->panel_info->bl_min, mfd->panel_info->bl_max,
+				1, mfd->panel_info->brightness_max);
+	}
 
 	if (bl_lvl && !value)
 		bl_lvl = 0;
