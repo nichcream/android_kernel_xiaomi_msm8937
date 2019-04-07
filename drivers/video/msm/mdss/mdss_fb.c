@@ -301,7 +301,7 @@ static int backlight_luts[MAX_BL_LUTS] = {
 				else if (v <= MAX_BL_LUTS) out = backlight_luts[v - 1]; \
 				else \
 				out = LINEAR_CONVERT(v, backlight_luts[MAX_BL_LUTS - 1], bl_max, \
-					MAX_BL_LUTS + 1, max_bright); \
+					MAX_BL_LUTS, max_bright); \
 				} while (0)
 
 static void mdss_fb_set_bl_brightness(struct led_classdev *led_cdev,
