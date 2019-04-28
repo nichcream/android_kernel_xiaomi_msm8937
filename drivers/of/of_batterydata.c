@@ -310,6 +310,9 @@ static int64_t of_batterydata_convert_battery_id_kohm(int batt_id_uv,
 	return resistor_value_kohm;
 }
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+static char *default_batt_type = "Generic_Battery";
+#endif
 struct device_node *of_batterydata_get_best_profile(
 		const struct device_node *batterydata_container_node,
 		const char *psy_name,  const char  *batt_type)
@@ -322,6 +325,9 @@ struct device_node *of_batterydata_get_best_profile(
 	int delta = 0, best_delta = 0, best_id_kohm = 0, id_range_pct,
 		batt_id_kohm = 0, i = 0, rc = 0, limit = 0;
 	bool in_range = false;
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	bool default_id = false;
+#endif
 
 	psy = power_supply_get_by_name(psy_name);
 	if (!psy) {
@@ -387,6 +393,24 @@ struct device_node *of_batterydata_get_best_profile(
 		}
 	}
 
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+	if (best_node == NULL) {
+		for_each_child_of_node(batterydata_container_node, node) {
+			if (default_batt_type != NULL) {
+				rc = of_property_read_string(node, "qcom,battery-type",
+						&battery_type);
+				if (!rc && strcmp(battery_type, default_batt_type) == 0) {
+					best_node = node;
+					best_id_kohm = batt_id_kohm;
+					default_id = true;
+					pr_err("No battery data found, Use default battery data\n");
+					break;
+				}
+			}
+		}
+	}
+#endif
+
 	if (best_node == NULL) {
 		pr_err("No battery data found\n");
 		return best_node;
@@ -394,7 +418,11 @@ struct device_node *of_batterydata_get_best_profile(
 
 	/* check that profile id is in range of the measured batt_id */
 	if (abs(best_id_kohm - batt_id_kohm) >
-			((best_id_kohm * id_range_pct) / 100)) {
+			((best_id_kohm * id_range_pct) / 100)
+#ifdef CONFIG_MACH_XIAOMI_SANTONI
+			&& !default_id
+#endif
+	) {
 		pr_err("out of range: profile id %d batt id %d pct %d",
 			best_id_kohm, batt_id_kohm, id_range_pct);
 		return NULL;
