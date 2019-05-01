@@ -304,11 +304,7 @@ struct ft5x06_ts_data {
 
 #define CTP_SYS_APK_UPDATE 0
 
-#ifdef CONFIG_MACH_XIAOMI_LAND
 #define TPD_AUTO_UPGRADE 1
-#else
-#define TPD_AUTO_UPGRADE 0
-#endif
 #define FTS_PROC_APK_DEBUG 1
 
 #define CTP_CHARGER_DETECT 1
